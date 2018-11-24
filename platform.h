@@ -14,5 +14,9 @@
 #define BUS_POWER_ON()  do{ LATA2 = 1; }while(0)
 #define BUS_POWER_OFF() do{ LATA2 = 0; }while(0)
 
+//macros that define what pins are connected to what
+#define ANALOG_CH_BATT_VOLTAGE 3
+#define ANALOG_CH_BATT_CURRENT 1
+#define ANALOG_CH_BUS_CURRENT  0
 #endif	/* LEDS_H */
 
