@@ -125,15 +125,16 @@ void init_adc(void) {
     //use system clock as ADC timer. Divider set by ADCLK
     ADCON0bits.CS = 0;
 
-    //this assumes FOSC is 12MHz, so if you change that change this
-    //this value sets ADC clock period to 1.5uS (Fosc/16). Before you change
-    // this number, please check datasheet table 37-1
+    //this assumes FOSC is 12MHz this value sets ADC clock period to
+    // 1.5uS (Fosc/16). Before you change this number, please check
+    // datasheet table 37-1
     ADCLK = 0b000111;
 
-    //right justify the 12 bit output of the ADC
-    // if this value is 0, the top 8 bits of read value are put in ADRESH, and
-    // the bottom 4 bits are put in the top 4 bits of ADRESL. In this mode,
-    // bottom 8 bits are in ADRESL, top 4 are in bottom 4 bits of ADRESH.
+    //right justify the 12 bit output of the ADC.  if this value is 0,
+    // the top 8 bits of read value are put in ADRESH, and the bottom
+    // 4 bits are put in the top 4 bits of ADRESL. In this mode,
+    // bottom 8 bits are in ADRESL, top 4 are in bottom 4 bits of
+    // ADRESH.
     ADCON0bits.FM = 1;
 
     //set the references
@@ -141,9 +142,6 @@ void init_adc(void) {
     ADREFbits.NREF = 0; //1 would set to external Vref-
     // positive reference to internal FVR module
     ADREFbits.PREF = 0b11;
-
-    //to start a conversion, set ADPCH to x to read from channel ANAx and set
-    // ADCON0bites.GO = 1
 }
 
 /*
