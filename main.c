@@ -1,11 +1,14 @@
 #include "config.h"
 #include "init.h"
 #include "platform.h"
+#include "analog.h"
 
 int main() {
     //initialization functions
     init_pins();
     init_oscillator();
+    init_adc();
+    init_interrupts();
 
     //program loop
     while(1) {
@@ -15,6 +18,8 @@ int main() {
         LED_3_OFF();
         //cut power to the bus
         BUS_POWER_OFF();
+        //start reading the analog values we need
+        analog_read_all_values();
         //wait for 10 seconds
         for(int i = 0; i < 100; ++i)
             //__delay_ms gets angry if you pass it large arguments
