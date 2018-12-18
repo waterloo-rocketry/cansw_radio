@@ -13,7 +13,7 @@ void init_adc(void);
 void init_uart(void);
 
 //set up all the interrupt related registers
-void init_interrupts();
+void init_interrupts(void);
 
 #endif	/* INIT_H */
 

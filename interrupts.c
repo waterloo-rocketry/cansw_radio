@@ -1,5 +1,6 @@
 #include "interrupts.h"
 #include "analog.h"
+#include "canlib/pic18f26k83/pic18f26k83_can.h"
 #include <xc.h>
 #include <stdint.h>
 
@@ -23,6 +24,9 @@ void __interrupt() isr() {
     if( PIE1bits.ADIE == 1 && PIR1bits.ADIF == 1) {
         adc_isr();
         PIR1bits.ADIF = 0;
+    } else if(PIR5) {
+        //something has happened to do with CAN, let the CAN driver handle it
+        can_handle_interrupt();
     } else {
         //unhandled interrupt. No idea what to do here, so just infinite loop
         while(1);

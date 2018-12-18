@@ -7,7 +7,7 @@
  * registers for all pins on the device. comments appear beside each assignment
  * to show what is connected to that pin.
  */
-void init_pins() {
+void init_pins(void) {
     //starting with port A
     ANSELA = ( 0 << 7 | //OSC1 pin
                0 << 6 | //OSC2 pin
@@ -61,12 +61,12 @@ void init_pins() {
     //now port C
     ANSELC = ( 0 << 7 | //XBEE_RESET
                0 << 6 | //XBEE_SLEEP
-               1 << 5 | //NC
-               1 << 4 | //NC
+               0 << 5 | //NC
+               0 << 4 | //NC
                0 << 3 | //CANTX
                0 << 2 | //CANRX
                0 << 1 | //Debug LED 1
-               1 << 0); //NC
+               0 << 0); //NC
     LATC   = ( 0 << 7 | //XBEE_RESET
                0 << 6 | //XBEE_SLEEP
                0 << 5 | //NC
@@ -83,13 +83,21 @@ void init_pins() {
                1 << 2 | //CANRX
                0 << 1 | //Debug LED 1
                1 << 0); //NC
+
+    //setup CAN output pins
+    //CANRX on RC2
+    CANRXPPS = 0b010010;
+
+    //CANTX on RC3
+    RC3PPS = 0b110011;
+
 }
 
 /*
  * Initialize the oscillator
  * Blocks while it tries to run off of the external oscillator.
  */
-void init_oscillator() {
+void init_oscillator(void) {
     //Select external oscillator with PLL of 1:1
     OSCCON1 = 0b01110000;
     //wait until the clock switch has happened
@@ -146,7 +154,7 @@ void init_adc(void) {
 }
 
 
-void init_uart() {
+void init_uart(void) {
     //set RX pin location
     U1RXPPS = (0b001 << 3) | //port B
               (0b100);       // pin 4
@@ -188,7 +196,7 @@ void init_uart() {
  * Turn on all the interrupts that we want
  * If you want a new interrupt, please turn it on here.
  */
-void init_interrupts() {
+void init_interrupts(void) {
     //enable global interrupts
     INTCON0bits.GIE = 1;
     //disable interrupt priorities. Another thing we could be fancy about
