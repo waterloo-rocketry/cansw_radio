@@ -10,7 +10,7 @@
  * a serialized system state should have SERIALIZED_OUTPUT_LEN - 1 ascii
  * characters in it
  */
-#define SERIALIZED_OUTPUT_LEN 10
+#define SERIALIZED_OUTPUT_LEN 3
 
 /*
  * This type contains all of the information that needs to be shared between
