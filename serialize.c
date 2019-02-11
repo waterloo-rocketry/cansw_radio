@@ -1,21 +1,37 @@
 #include "serialize.h"
 
+char binary_to_base64(uint8_t binary) {
+    if(binary <= 25) return binary + 'A';
+    if(binary <= 51) return (binary - 26) + 'a';
+    if(binary <= 61) return (binary - 52) + '0';
+    if(binary == 62) return '&';
+    return '/';
+}
+
+uint8_t base64_to_binary(char base64) {
+    if('A' <= base64 && base64 <= 'Z') return base64 - 'A';
+    if('a' <= base64 && base64 <= 'z') return base64 - 'a' + 26;
+    if('0' <= base64 && base64 <= '9') return base64 - '0' + 52;
+    if(base64 == '&') return 62;
+    return 63;
+}
+
 bool serialize_state(const system_state *state, char *str) {
     if(!state) return false;
     if(!str) return false;
 
-    str[0] = 0b01100001;
-    str[1] = 0b01100001;
-    str[2] = 0;
+    uint8_t raw = 0;
+    raw |= (state->num_boards_connected & 0b00000111) << 3;
+    if(state->injector_valve_open) raw |= 0b00000100;
+    if(state->vent_valve_open) raw |= 0b00000010;
+    if(state->running_self_test) raw |= 0b00000001;
+    str[0] = binary_to_base64(raw);
 
-    // num_boards_connected will occupy bits 3-5 in char 0.
-    // Since we have less than 8 boards, we will only need 3 bits
-    // to encode its value.
-    str[0] |= (state->num_boards_connected & 0b00000111) << 2;
-    if(state->injector_valve_open) str[0] |= 0b00000010;
-    if(state->vent_valve_open) str[1] |= 0b00010000;
-    if(state->running_self_test) str[1] |= 0b00001000;
-    if(state->any_errors_detected) str[1] |= 0b00000100;
+    raw = 0;
+    if(state->any_errors_detected) raw |= 0b00100000;
+    str[1] = binary_to_base64(raw);
+
+    str[2] = 0;
 
     return true;
 }
@@ -24,11 +40,16 @@ bool deserialize_state(system_state *state, const char *str) {
     if(!state) return false;
     if(!str) return false;
 
-    state->num_boards_connected = (str[0] & 0b00011100) >> 2;
-    state->injector_valve_open = str[0] & 0b00000010;
-    state->vent_valve_open = str[1] & 0b00010000;
-    state->running_self_test = str[1] & 0b00001000;
-    state->any_errors_detected = str[1] & 0b00000100;
+    uint8_t raw = base64_to_binary(str[0]);
+
+    state->num_boards_connected = (raw & 0b00111000) >> 3;
+    state->injector_valve_open = raw & 0b00000100;
+    state->vent_valve_open = raw & 0b00000010;
+    state->running_self_test = raw & 0b00000001;
+
+    raw = base64_to_binary(str[1]);
+
+    state->any_errors_detected = raw & 0b00100000;
 
     return true;
 }
@@ -42,6 +63,6 @@ bool compare_system_states(const system_state *s, const system_state *p) {
     if(s->vent_valve_open != p->vent_valve_open) return false;
     if(s->running_self_test != p->running_self_test) return false;
     if(s->any_errors_detected != p->any_errors_detected) return false;
-    
+
     return true;
 }

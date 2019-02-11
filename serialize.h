@@ -25,6 +25,21 @@ typedef struct {
 } system_state;
 
 /*
+ * This function converts a binary value from 0 to 63 inclusive into a
+ * printable charcter using a modified version of Base64. The + character is
+ * not used, and is replaced by the & character, due to the XBEE interpreting
+ * the + character as a special character.
+ */
+char binary_to_base64(uint8_t binary);
+
+/*
+ * This function converts a value from a modified version of Base64 into a raw
+ * binary value. See the description of the function binary_to_base64() for a
+ * description of the modified Base64 encoding and the reason for its use.
+ */
+uint8_t base64_to_binary(char base64);
+
+/*
  * This function takes a system_state and serializes it into ASCII text that
  * can be sent over the radio. It will return true if it was able to
  * successfully serialize the state, false otherwise. Examples of how it can
