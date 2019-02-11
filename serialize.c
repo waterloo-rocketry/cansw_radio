@@ -21,18 +21,18 @@ bool serialize_state(const system_state *state, char *str) {
     if(!str) return false;
 
     uint8_t raw = 0;
-    // Bits 0-3 represent the number of boards connected
+    // Bits 5-2 represent the number of boards connected
     raw |= (state->num_boards_connected & 0b00001111) << 2;
-    // Bit 4 represents the injector valve state
+    // Bit 1 represents the injector valve state
     if(state->injector_valve_open) raw |= 0b00000010;
-    // Bit 5 represents the vent valve state
+    // Bit 0 represents the vent valve state
     if(state->vent_valve_open) raw |= 0b00000001;
     str[0] = binary_to_base64(raw);
 
     raw = 0;
-    // Bit 0 represents whether self-testing is enabled
+    // Bit 5 represents whether self-testing is enabled
     if(state->running_self_test) raw |= 0b00100000;
-    // Bit 1 represents whether errors have been detected
+    // Bit 4 represents whether errors have been detected
     if(state->any_errors_detected) raw |= 0b00010000;
     str[1] = binary_to_base64(raw);
 
@@ -47,18 +47,18 @@ bool deserialize_state(system_state *state, const char *str) {
 
     uint8_t raw = base64_to_binary(str[0]);
 
-    // Bits 0-3 represent the number of boards connected
+    // Bits 5-2 represent the number of boards connected
     state->num_boards_connected = (raw & 0b00111100) >> 2;
-    // Bit 4 represents the injector valve state
+    // Bit 1 represents the injector valve state
     state->injector_valve_open = raw & 0b00000010;
-    // Bit 5 represents the vent valve state
+    // Bit 0 represents the vent valve state
     state->vent_valve_open = raw & 0b00000001;
 
     raw = base64_to_binary(str[1]);
 
-    // Bit 0 represents whether self-testing is enabled
+    // Bit 5 represents whether self-testing is enabled
     state->running_self_test = raw & 0b00100000;
-    // Bit 1 represents whether errors have been detected
+    // Bit 4 represents whether errors have been detected
     state->any_errors_detected = raw & 0b00010000;
 
     return true;
