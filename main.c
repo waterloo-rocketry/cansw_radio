@@ -53,23 +53,21 @@ int main()
     msg.data_len = 1;
     msg.data[0] = 0xAA;
     msg.data[1] = 0xAA;
-    while (1) {
-    };
 
     LED_3_OFF();
 
     //program loop
     uint32_t led_counter = 0;
     while (1) {
-        if (millis() - led_counter < 1000) {
+        if (millis() - led_counter < 10000) {
             LED_1_ON();
             LED_2_OFF();
             LED_3_OFF();
-        } else if (millis() - led_counter < 2000) {
+        } else if (millis() - led_counter < 20000) {
             LED_1_OFF();
             LED_2_ON();
             LED_3_OFF();
-        } else if (millis() - led_counter < 3000) {
+        } else if (millis() - led_counter < 30000) {
             LED_1_OFF();
             LED_2_OFF();
             LED_3_ON();
