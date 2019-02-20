@@ -4,6 +4,11 @@
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
+      <logicalFolder name="f1" displayName="canlib" projectFiles="true">
+        <itemPath>canlib/can_common.h</itemPath>
+        <itemPath>canlib/can.h</itemPath>
+        <itemPath>canlib/message_types.h</itemPath>
+      </logicalFolder>
       <itemPath>config.h</itemPath>
       <itemPath>init.h</itemPath>
       <itemPath>platform.h</itemPath>
@@ -11,8 +16,9 @@
       <itemPath>analog.h</itemPath>
       <itemPath>uart.h</itemPath>
       <itemPath>canlib/pic18f26k83/pic18f26k83_can.h</itemPath>
-      <itemPath>canlib/can.h</itemPath>
       <itemPath>pic18_time.h</itemPath>
+      <itemPath>sotscon.h</itemPath>
+      <itemPath>error.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -21,14 +27,19 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
+      <logicalFolder name="f1" displayName="canlib" projectFiles="true">
+        <itemPath>canlib/pic18f26k83/pic18f26k83_can.c</itemPath>
+        <itemPath>canlib/can_common.c</itemPath>
+      </logicalFolder>
       <itemPath>main.c</itemPath>
       <itemPath>config.c</itemPath>
       <itemPath>init.c</itemPath>
       <itemPath>analog.c</itemPath>
       <itemPath>interrupts.c</itemPath>
       <itemPath>uart.c</itemPath>
-      <itemPath>canlib/pic18f26k83/pic18f26k83_can.c</itemPath>
       <itemPath>pic18_time.c</itemPath>
+      <itemPath>sotscon.c</itemPath>
+      <itemPath>error.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -81,7 +92,7 @@
       </makeCustomizationType>
       <HI-TECH-COMP>
         <property key="asmlist" value="true"/>
-        <property key="define-macros" value=""/>
+        <property key="define-macros" value="BOARD_UNIQUE_ID=0x05"/>
         <property key="disable-optimizations" value="false"/>
         <property key="extra-include-directories" value=""/>
         <property key="favor-optimization-for" value="-speed,+space"/>
@@ -158,7 +169,6 @@
                   value="Press to browse for a specific firmware version"/>
         <property key="ToolFirmwareOption.UseLatestFirmware" value="true"/>
         <property key="debugoptions.useswbreakpoints" value="false"/>
-        <property key="firmware.download.all" value="false"/>
         <property key="hwtoolclock.frcindebug" value="false"/>
         <property key="memories.aux" value="false"/>
         <property key="memories.bootflash" value="true"/>
