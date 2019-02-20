@@ -4,7 +4,7 @@ static uint32_t millis_counter = 0;
 
 #define MILLIS_INCREMENT 21
 #define MILLIS_REMAINDER 2536
-#define MILLIS_INCREMENT_CAP 3000
+#define MILLIS_REMAINDER_CAP 3000
 
 uint32_t millis(void)
 {
@@ -26,10 +26,10 @@ void timer0_handle_interrupt()
     //max value for this counter is 2*8453, so we can use 16 bits
     static uint16_t internal_count = 0;
     //TODO, make these magic numbers calculated from XTAL_FREQ
-    millis_counter += 21;
-    internal_count += 8453;
-    if (internal_count > 10000) {
-        internal_count -= 10000;
+    millis_counter += MILLIS_INCREMENT;
+    internal_count += MILLIS_REMAINDER;
+    if (internal_count > MILLIS_REMAINDER_CAP) {
+        internal_count -= MILLIS_REMAINDER_CAP;
         millis_counter++;
     }
 }
