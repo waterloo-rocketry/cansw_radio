@@ -2,7 +2,7 @@
 #define RADIO_ERROR_H_
 
 #include <stdint.h>
-#include "canlib/message_types.h"
+#include "message_types.h"
 
 void report_error(uint8_t board_id,
                   enum BOARD_STATUS error_type,

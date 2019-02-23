@@ -1,6 +1,6 @@
 #include "sotscon.h"
-#include "canlib/can_common.h"
-#include "canlib/message_types.h"
+#include "can_common.h"
+#include "message_types.h"
 #include "pic18_time.h"
 #include "error.h"
 
@@ -172,7 +172,7 @@ uint8_t current_num_boards_connected(void)
 }
 
 /* Private function definitions */
-void update_all_timeouts(void)
+static void update_all_timeouts(void)
 {
     uint32_t current_time_ms = millis();
     /*

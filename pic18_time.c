@@ -11,6 +11,13 @@ uint32_t millis(void)
     return millis_counter;
 }
 
+uint32_t micros(void)
+{
+    //TODO, make this work. Somehow
+    return 0;
+}
+
+
 /*
  * At present, this function gets called every time that the 16 bit timer0
  * overflows. Since that timer ticks at a rate of Fosc/4 (3 MHz), this
