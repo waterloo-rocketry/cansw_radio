@@ -51,5 +51,5 @@ int main() {
     UNIT_TEST(!deserialize_state(&p, NULL), "Passing deserialize_state a null input pointer");
     UNIT_TEST(!deserialize_state(NULL, serialized_output), "Passing deserialize_state a null output pointer");
 
-    printf("Test Results: %i tests, %i passed, %i %sfailed%s\n", total_tests, total_tests - failing_tests, failing_tests, failing_tests ? COLOR_RED : COLOR_GREEN, COLOR_NONE);
+    printf("%s Test Results: %i tests, %i passed, %i %sfailed%s\n", __FILE__, total_tests, total_tests - failing_tests, failing_tests, failing_tests ? COLOR_RED : COLOR_GREEN, COLOR_NONE);
 }

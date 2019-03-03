@@ -11,6 +11,13 @@
  * characters in it
  */
 #define SERIALIZED_OUTPUT_LEN 3
+/*
+ * Length of a state command. A state command is a block of characters
+ * that can be sent over the radio. It's mostly the serialized state output
+ * with a couple of additional bytes for STATE_COMMAND header and for a
+ * CRC or hamming code
+ */
+#define STATE_COMMAND_LEN 5
 
 /*
  * This type contains all of the information that needs to be shared between
@@ -61,5 +68,11 @@ bool deserialize_state(system_state *state, const char *str);
  * struct, due to data representation reasons
  */
 bool compare_system_states(const system_state *s, const system_state *p);
+
+/*
+ * This function creates a state command that can be sent over the radio
+ * byte by byte. Returns false if it couldn't do so, for some reason
+ */
+bool create_state_command(char *cmd, const system_state *state);
 
 #endif

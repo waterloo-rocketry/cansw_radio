@@ -76,3 +76,8 @@ bool compare_system_states(const system_state *s, const system_state *p) {
 
     return true;
 }
+
+bool create_state_command(char *cmd, const system_state *state) {
+    //TODO
+    return true;
+}

@@ -1,15 +1,21 @@
 
-out=unit_tests
-
-objects = serialize_test.o
-objects+= serialize.o
+objects = serialize.o
+objects+= radio_handler.o
 
 CFLAGS+="-I.."
+CFLAGS+="-I../canlib/"
 
 VPATH+=..
 
-all: $(out)
-	./$(out)
+all: serialize_test radio_handler_test
+	./serialize_test
+	./radio_handler_test
+
+serialize_test: $(objects) serialize_test.o
+	gcc -o $@ $^ $(CFLAGS)
+
+radio_handler_test: $(objects) radio_handler_test.o
+	gcc -o $@ $^ $(CFLAGS)
 
 %.o: %.c
 	gcc -c -o $@ $< $(CFLAGS)
