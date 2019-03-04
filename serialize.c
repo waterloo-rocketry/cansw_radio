@@ -78,6 +78,34 @@ bool compare_system_states(const system_state *s, const system_state *p) {
 }
 
 bool create_state_command(char *cmd, const system_state *state) {
-    //TODO
+    if(cmd == 0) return false;
+    if(state == 0) return false;
+
+    char serialized[SERIALIZED_OUTPUT_LEN];
+    if(!serialize_state(state, serialized)) return false;
+
+    // Do not copy the null terminator of the serialized string
+    memcpy(cmd + 1, serialized, SERIALIZED_OUTPUT_LEN - 1);
+
+    // Message start indicator
+    cmd[0] = '{';
+    // Checksum
+    cmd[STATE_COMMAND_LEN - 2] = checksum(serialized);
+    // Null terminator
+    cmd[STATE_COMMAND_LEN - 1] = 0;
+
     return true;
+}
+
+char checksum(char *cmd) {
+    uint8_t total = 0;
+    uint8_t idx = 0;
+    while(cmd[idx] != 0) {
+        char curr = cmd[idx];
+        uint8_t odd_sum = 0b10101010 & curr, even_sum = 0b01010101 & curr;
+        total += odd_sum + 3 * even_sum;
+        ++idx;
+    }
+    total %= 64;
+    return binary_to_base64(total);
 }

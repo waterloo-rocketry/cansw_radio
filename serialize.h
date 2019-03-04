@@ -75,4 +75,12 @@ bool compare_system_states(const system_state *s, const system_state *p);
  */
 bool create_state_command(char *cmd, const system_state *state);
 
+/*
+ * This function computes the checksum of a NULL-terminated message using a
+ * modified version of the Luhn algorithm. The checksum is equal to the sum of
+ * the odd-placed digits plus three times the sum of the even-placed digits,
+ * modulo 64. The function returns the Base-64 encoding of the checksum.
+ */
+char checksum(char *cmd);
+
 #endif
