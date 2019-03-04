@@ -1,9 +1,12 @@
 #include "radio_handler.h"
 #include "serialize.h"
+#include "pic18_time.h" // for millis()
 #include <string.h> // for memcpy
 
 static enum VALVE_STATE inj_valve_state = VALVE_UNK;
 static enum VALVE_STATE vent_valve_state = VALVE_OPEN;
+
+static uint32_t last_contact_millis = 0;
 
 enum VALVE_STATE radio_get_expected_inj_valve_state(void)
 {
@@ -12,6 +15,12 @@ enum VALVE_STATE radio_get_expected_inj_valve_state(void)
 
 enum VALVE_STATE radio_get_expected_vent_valve_state(void)
 {
+    // Return VALVE_OPEN, regardless of vent_valve_state,
+    // if we haven't received any complete messages in a while
+    uint32_t time_since_last_contact = millis() - last_contact_millis;
+    if(time_since_last_contact >= TIME_NO_CONTACT_BEFORE_SAFE_STATE) {
+        return VALVE_OPEN;
+    }
     return vent_valve_state;
 }
 
@@ -42,7 +51,9 @@ void radio_handle_input_character(uint8_t c)
             deserialize_state(&state, serialized);
             inj_valve_state = state.injector_valve_open ? VALVE_OPEN
                 : VALVE_CLOSED;
-            vent_valve_state = state.vent_valve_open ? VALVE_OPEN : VALVE_CLOSED;
+            vent_valve_state = state.vent_valve_open ? VALVE_OPEN
+                : VALVE_CLOSED;
+            last_contact_millis = millis();
         }
         else {
             // Discard this message

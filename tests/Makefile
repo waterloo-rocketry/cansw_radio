@@ -1,6 +1,7 @@
 
 objects = serialize.o
 objects+= radio_handler.o
+objects+= ../pic18_time.o
 
 CFLAGS+="-I.."
 CFLAGS+="-I../canlib/"

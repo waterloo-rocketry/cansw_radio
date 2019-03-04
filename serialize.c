@@ -1,4 +1,5 @@
 #include "serialize.h"
+#include <stddef.h> // for NULL
 
 char binary_to_base64(uint8_t binary) {
     if(binary <= 25) return binary + 'A';

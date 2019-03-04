@@ -5,6 +5,12 @@
 #include <stdint.h>
 
 /*
+ * The maximum allowable time between received messages.
+ * After this time, the vent valve is automatically opened.
+ */
+#define TIME_NO_CONTACT_BEFORE_SAFE_STATE 10000
+
+/*
  * Returns the state that the operators on the ground are telling us that the
  * injector valve should be in. If we haven't heard from the operators ever (we
  * just booted up and haven't established radio contact), this function will
