@@ -4,11 +4,13 @@
 #include "analog.h"
 #include "uart.h"
 #include "canlib/pic18f26k83/pic18f26k83_can.h"
+#include "pic18_time.h"
 
 #include <string.h>
 
-void can_message_callback(const can_msg_t *msg) {
-    if((msg->sid & 0x7E0) == 0x7E0) {
+void can_message_callback(const can_msg_t *msg)
+{
+    if ((msg->sid & 0x7E0) == 0x7E0) {
         LED_1_ON();
         LED_2_ON();
         LED_3_ON();
@@ -21,11 +23,13 @@ void can_message_callback(const can_msg_t *msg) {
     }
 }
 
-int main() {
+int main()
+{
     //initialization functions
     init_pins();
     init_oscillator();
     init_adc();
+    init_timer0();
     init_interrupts();
     init_uart();
 
@@ -49,37 +53,26 @@ int main() {
     msg.data_len = 1;
     msg.data[0] = 0xAA;
     msg.data[1] = 0xAA;
-    while(1) {
-    };
 
     LED_3_OFF();
 
     //program loop
-    while(1) {
-        if(uart_byte_available()) {
-            char c = uart_read_byte();
-            switch(c) {
-            case '1':
-                LED_1_ON();
-                LED_2_OFF();
-                LED_3_OFF();
-                break;
-            case '2':
-                LED_1_OFF();
-                LED_2_ON();
-                LED_3_OFF();
-                break;
-            case '3':
-                LED_1_OFF();
-                LED_2_OFF();
-                LED_3_ON();
-                break;
-            default:
-                LED_1_OFF();
-                LED_2_OFF();
-                LED_3_OFF();
-                break;
-            }
+    uint32_t led_counter = 0;
+    while (1) {
+        if (millis() - led_counter < 10000) {
+            LED_1_ON();
+            LED_2_OFF();
+            LED_3_OFF();
+        } else if (millis() - led_counter < 20000) {
+            LED_1_OFF();
+            LED_2_ON();
+            LED_3_OFF();
+        } else if (millis() - led_counter < 30000) {
+            LED_1_OFF();
+            LED_2_OFF();
+            LED_3_ON();
+        } else {
+            led_counter = millis();
         }
     }
 

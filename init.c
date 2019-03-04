@@ -7,7 +7,8 @@
  * registers for all pins on the device. comments appear beside each assignment
  * to show what is connected to that pin.
  */
-void init_pins(void) {
+void init_pins(void)
+{
     //starting with port A
     ANSELA = ( 0 << 7 | //OSC1 pin
                0 << 6 | //OSC2 pin
@@ -97,15 +98,16 @@ void init_pins(void) {
  * Initialize the oscillator
  * Blocks while it tries to run off of the external oscillator.
  */
-void init_oscillator(void) {
+void init_oscillator(void)
+{
     //Select external oscillator with PLL of 1:1
     OSCCON1 = 0b01110000;
     //wait until the clock switch has happened
     while (OSCCON3bits.ORDY == 0)  {}
     //if the currently active clock (CON2) isn't the selected clock (CON1)
-    if(OSCCON2 != 0b01110000) {
+    if (OSCCON2 != 0b01110000) {
         //infinite loop, something is broken, what even is an assert()?
-        while(1) {}
+        while (1) {}
     }
 }
 
@@ -113,7 +115,8 @@ void init_oscillator(void) {
  * Initializes all necessary registers for the adc module
  * Currently only sets up for reading the battery voltage from pin ANA3
  */
-void init_adc(void) {
+void init_adc(void)
+{
     //enable fixed voltage reference
     FVRCONbits.EN = 1;
     //set the voltage reference to be 4.096V on both outputs
@@ -122,7 +125,7 @@ void init_adc(void) {
     //disable the temperature indicator.... for now....
     FVRCONbits.TSEN = 0;
     //wait for the FVR to stabilize
-    while(FVRCONbits.RDY == 0) {}
+    while (FVRCONbits.RDY == 0) {}
 
     //turn on the ADC
     ADCON0bits.ON = 1;
@@ -154,7 +157,8 @@ void init_adc(void) {
 }
 
 
-void init_uart(void) {
+void init_uart(void)
+{
     //set RX pin location
     U1RXPPS = (0b001 << 3) | //port B
               (0b100);       // pin 4
@@ -191,12 +195,29 @@ void init_uart(void) {
     U1CON1bits.ON = 1;
 }
 
+void init_timer0(void)
+{
+    //disable the module so we can screw with it
+    T0CON0bits.EN = 0;
+    //set timer up to be a 16 bit timer
+    T0CON0bits.MD16 = 1;
+    //set the pre and postscalars to 0. Because I don't know what they do
+    T0CON0bits.OUTPS = 0;
+    T0CON1bits.CKPS = 0;
+    //drive the timer from Fosc/4
+    T0CON1bits.CS = 0b010;
+    T0CON1bits.ASYNC = 0;
+
+    //enable the module
+    T0CON0bits.EN = 1;
+}
 
 /*
  * Turn on all the interrupts that we want
  * If you want a new interrupt, please turn it on here.
  */
-void init_interrupts(void) {
+void init_interrupts(void)
+{
     //enable global interrupts
     INTCON0bits.GIE = 1;
     //disable interrupt priorities. Another thing we could be fancy about
@@ -204,6 +225,10 @@ void init_interrupts(void) {
 
     //enable ADC interrupt
     PIE1bits.ADIE = 1;
+
+    //enable timer 0 interrupt
+    PIE3bits.TMR0IE = 1;
+
 
     //at present we are not using vectored interrupts. If we were being fancy,
     //we would be using vectored interrupts. If you feel like being fancy and

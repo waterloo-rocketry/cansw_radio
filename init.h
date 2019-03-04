@@ -12,6 +12,9 @@ void init_adc(void);
 
 void init_uart(void);
 
+//set up timer 0, which is used for millis() function
+void init_timer0(void);
+
 //set up all the interrupt related registers
 void init_interrupts(void);
 
