@@ -18,6 +18,10 @@
  * CRC or hamming code
  */
 #define STATE_COMMAND_LEN 5
+/*
+ * This character indicates the beginning of a state command.
+ */
+#define STATE_COMMAND_HEADER '{'
 
 /*
  * This type contains all of the information that needs to be shared between

@@ -17,8 +17,8 @@ uint8_t base64_to_binary(char base64) {
 }
 
 bool serialize_state(const system_state *state, char *str) {
-    if(!state) return false;
-    if(!str) return false;
+    if(state == NULL) return false;
+    if(str == NULL) return false;
 
     uint8_t raw = 0;
     // Bits 5-2 represent the number of boards connected
@@ -42,8 +42,8 @@ bool serialize_state(const system_state *state, char *str) {
 }
 
 bool deserialize_state(system_state *state, const char *str) {
-    if(!state) return false;
-    if(!str) return false;
+    if(state == NULL) return false;
+    if(str == NULL) return false;
 
     uint8_t raw = base64_to_binary(str[0]);
 
@@ -65,8 +65,8 @@ bool deserialize_state(system_state *state, const char *str) {
 }
 
 bool compare_system_states(const system_state *s, const system_state *p) {
-    if(!s) return false;
-    if(!p) return false;
+    if(s == NULL) return false;
+    if(p == NULL) return false;
 
     if(s->num_boards_connected != p->num_boards_connected) return false;
     if(s->injector_valve_open != p->injector_valve_open) return false;
@@ -78,8 +78,8 @@ bool compare_system_states(const system_state *s, const system_state *p) {
 }
 
 bool create_state_command(char *cmd, const system_state *state) {
-    if(cmd == 0) return false;
-    if(state == 0) return false;
+    if(cmd == NULL) return false;
+    if(state == NULL) return false;
 
     char serialized[SERIALIZED_OUTPUT_LEN];
     if(!serialize_state(state, serialized)) return false;
@@ -88,7 +88,7 @@ bool create_state_command(char *cmd, const system_state *state) {
     memcpy(cmd + 1, serialized, SERIALIZED_OUTPUT_LEN - 1);
 
     // Message start indicator
-    cmd[0] = '{';
+    cmd[0] = STATE_COMMAND_HEADER;
     // Checksum
     cmd[STATE_COMMAND_LEN - 2] = checksum(serialized);
     // Null terminator
@@ -102,7 +102,8 @@ char checksum(char *cmd) {
     uint8_t idx = 0;
     while(cmd[idx] != 0) {
         char curr = cmd[idx];
-        uint8_t odd_sum = 0b10101010 & curr, even_sum = 0b01010101 & curr;
+        uint8_t odd_sum = 0b10101010 & curr;
+        uint8_t even_sum = 0b01010101 & curr;
         total += odd_sum + 3 * even_sum;
         ++idx;
     }

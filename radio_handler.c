@@ -20,9 +20,9 @@ void radio_handle_input_character(uint8_t c)
     static char message[STATE_COMMAND_LEN] = {0};
     static uint8_t chars_received = 0;
 
-    if(c == '{') {
+    if(c == STATE_COMMAND_HEADER) {
         chars_received = 1;
-        message[0] = '{';
+        message[0] = STATE_COMMAND_HEADER;
     }
 
     else if(chars_received == STATE_COMMAND_LEN - 2) {
@@ -59,5 +59,4 @@ void radio_handle_input_character(uint8_t c)
         }
         // Otherwise, simply discard the character.
     }
-    //TODO
 }
