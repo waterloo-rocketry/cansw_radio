@@ -64,4 +64,16 @@ enum VALVE_STATE current_inj_valve_position(void);
  */
 uint8_t current_num_boards_connected(void);
 
+/*
+ * Returns true if any boards that are connected to the CAN bus are believed
+ * to have any active errors. An error is defined as active if the board that
+ * sent it has not sent MAX_CONSECUTIVE_NOMINALS E_NOMINAL messages (the
+ * "everything is ok" message) since sending it.
+ *
+ * So if the vent board sends a "battery voltage low" error message, this
+ * function will return true until the vent board has sent MAX_CONSECUTIVE_NOMINALS
+ * "Everything is find" messages.
+ */
+bool any_errors_active(void);
+
 #endif

@@ -13,6 +13,14 @@
  */
 #define MAX_BOARD_UNIQUE_ID 0x0C
 
+/*
+ * We keep track of how many consecutive E_NOMINAL general status messages
+ * we've received from each board. If we receive this many E_NOMINAL's in a
+ * row, we consider that board to have no errors active (for the purposes of
+ * any_errors_active())
+ */
+#define MAX_CONSECUTIVE_NOMINALS 20
+
 /* Internal data */
 
 /*
@@ -24,6 +32,7 @@
 static struct {
     bool valid; //if we have ever received a message from the board, this is true
     uint32_t time_last_message_received_ms;
+    uint8_t consecutive_nominals; //how many nominal statuses we've received in a row
 } boards[MAX_BOARD_UNIQUE_ID + 1]; //+1 because array indexing starts at 0
 
 /*
@@ -46,8 +55,15 @@ static enum VALVE_STATE  inj_valve_state;
  */
 static uint8_t connected_boards = 0;
 
+/*
+ * If we see any error ever, set this to true. If, after that, we receive
+ * MAX_CONSECUTIVE_NOMINALS E_NOMINAL messages from that board, mark this false
+ */
+static bool errors_active = false;
+
 /* Private function declarations */
 static void update_all_timeouts(void);
+static void update_errors_active(void);
 
 /* Public function definitions */
 void init_sotscon(void)
@@ -74,8 +90,25 @@ void handle_incoming_can_message(const can_msg_t *msg)
     } else {
         switch (get_message_type(msg)) {
             case MSG_GENERAL_BOARD_STATUS:
-                //TODO, this means either that the board is sending an error
-                //or a heartbeat
+                boards[sender_unique_id].valid = true;
+                boards[sender_unique_id].time_last_message_received_ms = millis();
+                uint8_t error_code = msg->data[3];
+                if (error_code == E_NOMINAL) {
+                    if (boards[sender_unique_id].consecutive_nominals < MAX_CONSECUTIVE_NOMINALS) {
+                        boards[sender_unique_id].consecutive_nominals++;
+                    } else {
+                        update_errors_active();
+                    }
+                } else {
+                    boards[sender_unique_id].consecutive_nominals = 0;
+                    errors_active = true;
+                    report_error(sender_unique_id,
+                                 error_code,
+                                 msg->data[4],
+                                 msg->data[5],
+                                 msg->data[6],
+                                 msg->data[7]);
+                }
                 break;
 
             /* Update our idea of the last vent valve state */
@@ -171,6 +204,11 @@ uint8_t current_num_boards_connected(void)
     return connected_boards;
 }
 
+bool any_errors_active(void)
+{
+    return errors_active;
+}
+
 /* Private function definitions */
 static void update_all_timeouts(void)
 {
@@ -211,4 +249,32 @@ static void update_all_timeouts(void)
         //mark the inj valve state as invalid
         inj_valve_state = VALVE_UNK;
     }
+}
+
+/*
+ * Loop through all the boards. If any of them have received fewer than
+ * MAX_CONSECUTIVE_NOMINALS E_NOMINAL messages, set errors_active to true,
+ * because that board still has an error active. If all boards have received
+ * that many nominal messages, set errors_active to false
+ */
+static void update_errors_active(void)
+{
+    /*
+     * errors_active is set true whenever we receive an error message. Therefore,
+     * if errors_active is false, we've never received an error message or all
+     * boards have received enough nominal messages to clear the errors. Either
+     * way, there's no point in checking all the boards
+     */
+    if (errors_active == false) {
+        return;
+    }
+    uint8_t i;
+    for (i = 1; i < MAX_BOARD_UNIQUE_ID; ++i) {
+        if (boards[i].valid &&
+            (boards[i].consecutive_nominals < MAX_CONSECUTIVE_NOMINALS)) {
+            errors_active = true;
+            return;
+        }
+    }
+    errors_active = false;
 }
