@@ -22,6 +22,7 @@
       <itemPath>error.h</itemPath>
       <itemPath>radio_handler.h</itemPath>
       <itemPath>sotscon_sender.h</itemPath>
+      <itemPath>bus_power.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -46,6 +47,7 @@
       <itemPath>error.c</itemPath>
       <itemPath>radio_handler.c</itemPath>
       <itemPath>sotscon_sender.c</itemPath>
+      <itemPath>bus_power.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -167,6 +169,7 @@
         <property key="opt-xc8-linker-link_startup" value="false"/>
         <property key="opt-xc8-linker-serial" value=""/>
         <property key="program-the-device-with-default-config-words" value="true"/>
+        <appendMe value="--msgdisable=520"/>
       </HI-TECH-LINK>
       <PICkit3PlatformTool>
         <property key="AutoSelectMemRanges" value="auto"/>

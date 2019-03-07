@@ -10,6 +10,7 @@
 #include "sotscon.h"
 #include "sotscon_sender.h"
 #include "radio_handler.h"
+#include "bus_power.h"
 
 #include <string.h>
 
@@ -67,13 +68,25 @@ int main()
             radio_handle_input_character(uart_read_byte());
         }
 
+        // We check for CAN messages regardles of whether the bus is powered.
+        // It's possible that the debug header is trying to tell us something,
+        // and we should really listen to that
         if (buffered_received_can_message_available()) {
             can_msg_t msg;
             get_buffered_can_message(&msg);
             handle_incoming_can_message(&msg);
         }
 
-        sotscon_heartbeat();
+        if (is_bus_powered()) {
+            // There's no sense in sending CAN messages if the bus isn't
+            // powered. There's no one to hear them
+            sotscon_heartbeat();
+        } else {
+            // TODO, what should the radio board do while the bus is powered
+            // down? The ADC stuff I guess?
+        }
+
+        bus_power_heartbeat();
     }
 
     //unreachable
