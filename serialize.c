@@ -6,7 +6,9 @@ char binary_to_base64(uint8_t binary) {
     if(binary <= 51) return (binary - 26) + 'a';
     if(binary <= 61) return (binary - 52) + '0';
     if(binary == 62) return '&';
-    return '/';
+    if(binary == 63) return '/';
+    // ***TODO***: return an error in all other cases
+    return 0;
 }
 
 uint8_t base64_to_binary(char base64) {
@@ -14,7 +16,9 @@ uint8_t base64_to_binary(char base64) {
     if('a' <= base64 && base64 <= 'z') return base64 - 'a' + 26;
     if('0' <= base64 && base64 <= '9') return base64 - '0' + 52;
     if(base64 == '&') return 62;
-    return 63;
+    if(base64 == '/') return 63;
+    // ***TODO***: return an error in all other cases
+    return 255;
 }
 
 bool serialize_state(const system_state *state, char *str) {
