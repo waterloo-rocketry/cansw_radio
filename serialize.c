@@ -106,9 +106,16 @@ char checksum(char *cmd) {
     uint8_t total = 0;
     uint8_t idx = 0;
     while(cmd[idx] != 0) {
-        char curr = cmd[idx];
-        uint8_t odd_sum = 0b10101010 & curr;
-        uint8_t even_sum = 0b01010101 & curr;
+        uint8_t curr = (uint8_t) cmd[idx];
+        // uint8_t odd_sum = 0b10101010 & curr;
+        // uint8_t even_sum = 0b01010101 & curr;
+        uint8_t odd_sum = 0;
+        uint8_t even_sum = 0;
+        for(uint8_t i = 0; i < 4; ++i) {
+            odd_sum += 0b00000010 & curr;
+            even_sum += 0b00000001 & curr;
+            curr >> 2;
+        }
         total += odd_sum + 3 * even_sum;
         ++idx;
     }
