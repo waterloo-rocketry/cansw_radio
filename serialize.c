@@ -107,8 +107,6 @@ char checksum(char *cmd) {
     uint8_t idx = 0;
     while(cmd[idx] != 0) {
         uint8_t curr = (uint8_t) cmd[idx];
-        // uint8_t odd_sum = 0b10101010 & curr;
-        // uint8_t even_sum = 0b01010101 & curr;
         uint8_t odd_sum = 0;
         uint8_t even_sum = 0;
         for(uint8_t i = 0; i < 4; ++i) {
