@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include "error.h"
 
 /*
  * This macro defines how long (in bytes) a string must be in order to
@@ -64,6 +65,16 @@ bool serialize_state(const system_state *state, char *str);
  * was successfully able to deserialize a state, false otherwise
  */
 bool deserialize_state(system_state *state, const char *str);
+
+/*
+ *
+ */
+bool serialize_error(const error_t *err, char *str);
+
+/*
+ *
+ */
+bool deserialize_error(error_t *err, const char *str);
 
 /*
  * Returns true if the two system states passed to it are equal (returns

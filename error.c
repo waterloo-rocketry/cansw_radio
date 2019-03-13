@@ -7,3 +7,8 @@ void report_error(uint8_t board_id,
 {
     //do nothing
 }
+
+bool get_next_serialized_error(char *output)
+{
+    return false;
+}

@@ -1,4 +1,5 @@
 #include "serialize.h"
+#include <string.h>
 #include <stddef.h> // for NULL
 
 char binary_to_base64(uint8_t binary) {
@@ -67,6 +68,14 @@ bool deserialize_state(system_state *state, const char *str) {
     state->any_errors_detected = raw & 0b00010000;
 
     return true;
+}
+
+bool serialize_error(const error_t *err, char *str) {
+    return false;
+}
+
+bool deserialize_error(error_t *err, const char *str) {
+    return false;
 }
 
 bool compare_system_states(const system_state *s, const system_state *p) {
