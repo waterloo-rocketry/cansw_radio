@@ -8,7 +8,8 @@
         <itemPath>canlib/can_common.h</itemPath>
         <itemPath>canlib/can.h</itemPath>
         <itemPath>canlib/message_types.h</itemPath>
-        <itemPath>canlib/util/buffer_received_can_message.h</itemPath>
+        <itemPath>canlib/util/can_rcv_buffer.h</itemPath>
+        <itemPath>canlib/pic18f26k83/pic18f26k83_can.h</itemPath>
       </logicalFolder>
       <itemPath>config.h</itemPath>
       <itemPath>init.h</itemPath>
@@ -16,7 +17,6 @@
       <itemPath>interrupts.h</itemPath>
       <itemPath>analog.h</itemPath>
       <itemPath>uart.h</itemPath>
-      <itemPath>canlib/pic18f26k83/pic18f26k83_can.h</itemPath>
       <itemPath>pic18_time.h</itemPath>
       <itemPath>sotscon.h</itemPath>
       <itemPath>error.h</itemPath>
@@ -34,7 +34,7 @@
       <logicalFolder name="f1" displayName="canlib" projectFiles="true">
         <itemPath>canlib/pic18f26k83/pic18f26k83_can.c</itemPath>
         <itemPath>canlib/can_common.c</itemPath>
-        <itemPath>canlib/util/buffer_received_can_message.c</itemPath>
+        <itemPath>canlib/util/can_rcv_buffer.c</itemPath>
       </logicalFolder>
       <itemPath>main.c</itemPath>
       <itemPath>config.c</itemPath>

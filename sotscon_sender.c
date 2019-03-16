@@ -44,11 +44,10 @@ static void rl_send_vent_valve_cmd(enum VALVE_STATE s)
         return;
     }
     can_msg_t valve_cmd;
-    uint8_t can_msg_data = s; //only one byte of data needed for valve commands
-    if (!build_can_message(MSG_VENT_VALVE_CMD,
-                           micros(),
-                           &can_msg_data,
-                           &valve_cmd)) {
+    if (!build_valve_cmd_msg(micros(),
+                            s,
+                            MSG_VENT_VALVE_CMD,
+                            &valve_cmd)) {
         report_error(BOARD_UNIQUE_ID, E_SEGFAULT, 0, 0, 0, 0);
     } else {
         can_send(&valve_cmd, 0);
@@ -65,10 +64,10 @@ static void rl_send_inj_valve_cmd(enum VALVE_STATE s)
     }
     can_msg_t valve_cmd;
     uint8_t can_msg_data = s; //only one byte of data needed for valve commands
-    if (!build_can_message(MSG_INJ_VALVE_CMD,
-                           micros(),
-                           &can_msg_data,
-                           &valve_cmd)) {
+    if (!build_valve_cmd_msg(micros(),
+                            s,
+                            MSG_INJ_VALVE_CMD,
+                            &valve_cmd)) {
         report_error(BOARD_UNIQUE_ID, E_SEGFAULT, 0, 0, 0, 0);
     } else {
         can_send(&valve_cmd, 0);

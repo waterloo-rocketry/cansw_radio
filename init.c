@@ -199,13 +199,13 @@ void init_timer0(void)
 {
     //disable the module so we can screw with it
     T0CON0bits.EN = 0;
-    //set timer up to be a 16 bit timer
-    T0CON0bits.MD16 = 1;
+    //set timer up to be an 8 bit timer
+    T0CON0bits.MD16 = 0;
     //set the pre and postscalars to 0. Because I don't know what they do
     T0CON0bits.OUTPS = 0;
     T0CON1bits.CKPS = 0;
-    //drive the timer from Fosc/4
-    T0CON1bits.CS = 0b010;
+    //drive the timer from 500 kHz internal oscillator
+    T0CON1bits.CS = 0x5;
     T0CON1bits.ASYNC = 0;
 
     //enable the module

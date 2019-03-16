@@ -4,7 +4,7 @@
 #include "analog.h"
 #include "uart.h"
 #include "pic18f26k83_can.h"
-#include "buffer_received_can_message.h"
+#include "can_rcv_buffer.h"
 #include "can_common.h"
 #include "pic18_time.h"
 #include "sotscon.h"
@@ -27,7 +27,7 @@ void can_message_callback(const can_msg_t *msg)
         LED_3_OFF();
     }
 
-    buffer_received_can_message(msg);
+    rcvb_push_message(msg);
 }
 
 //enough space to buffer 10 CAN messages
@@ -43,7 +43,7 @@ int main()
     init_interrupts();
     init_uart();
     init_sotscon();
-    receive_buffer_init(can_receive_buffer, sizeof(can_receive_buffer));
+    rcvb_init(can_receive_buffer, sizeof(can_receive_buffer));
 
     LED_1_OFF();
     LED_2_OFF();
@@ -71,9 +71,9 @@ int main()
         // We check for CAN messages regardles of whether the bus is powered.
         // It's possible that the debug header is trying to tell us something,
         // and we should really listen to that
-        if (buffered_received_can_message_available()) {
+        if (!rcvb_is_empty()) {
             can_msg_t msg;
-            get_buffered_can_message(&msg);
+            rcvb_pop_message(&msg);
             handle_incoming_can_message(&msg);
         }
 

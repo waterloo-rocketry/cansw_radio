@@ -107,12 +107,10 @@ void trigger_bus_shutdown(void)
             state = BUS_SHUTDOWN;
             time_last_state_transition = millis();
 
-            uint8_t can_msg_data = BUS_DOWN_WARNING;
             can_msg_t power_down_warning;
-            build_can_message(MSG_GENERAL_CMD,
-                              micros(),
-                              &can_msg_data,
-                              &power_down_warning);
+            build_general_cmd_msg(micros(),
+                                  BUS_DOWN_WARNING,
+                                  &power_down_warning);
             can_send(&power_down_warning, 0);
             break;
         default:
