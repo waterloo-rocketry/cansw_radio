@@ -35,6 +35,7 @@
         <itemPath>canlib/pic18f26k83/pic18f26k83_can.c</itemPath>
         <itemPath>canlib/can_common.c</itemPath>
         <itemPath>canlib/util/can_rcv_buffer.c</itemPath>
+        <itemPath>canlib/util/timing_util.c</itemPath>
       </logicalFolder>
       <itemPath>main.c</itemPath>
       <itemPath>config.c</itemPath>
@@ -179,6 +180,7 @@
                   value="Press to browse for a specific firmware version"/>
         <property key="ToolFirmwareOption.UseLatestFirmware" value="true"/>
         <property key="debugoptions.useswbreakpoints" value="false"/>
+        <property key="firmware.download.all" value="false"/>
         <property key="hwtoolclock.frcindebug" value="false"/>
         <property key="memories.aux" value="false"/>
         <property key="memories.bootflash" value="true"/>
