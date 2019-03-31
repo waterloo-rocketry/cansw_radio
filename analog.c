@@ -35,14 +35,30 @@ uint16_t analog_get_vin_mv(void)
 
 uint16_t analog_get_ibatt_ma(void)
 {
-    // TODO, scale this properly for milliamps
-    return analog_last_batt_current;
+    /*
+     * the ADC is reading a signal that has been amplified 100x. The sense
+     * resistors are 150mOhm. Therefore, 1mA = 150uV * 100 = 15mV.
+     *
+     * one ADC read is 1mV (12 bit gives 4096 possible numbers, and we're
+     * comparing to a voltage of 4.096V. Therefore, to go from
+     * analog_last_batt_current to battery current in mA, we have to divide by
+     * 15.
+     *
+     * Anecdotally, I ran this in debug mode and found that we were getting
+     * anywhere between 14 and 24 mA, and then I ran it in normal mode and
+     * measured the current draw, and got abotu 22mA (jumping up to 27 mA when
+     * an LED turned on, as you'd expect). So I'm calling this division thing
+     * pretty accurate.
+     */
+    return analog_last_batt_current / 15;
 }
 
 uint16_t analog_get_ibus_ma(void)
 {
-    // TODO, scale this properly for milliamps
-    return analog_last_bus_current;
+    /*
+     * Same logic as above. Divide by 15.
+     */
+    return analog_last_bus_current / 15;
 }
 
 //the states for the adc state machine thing
