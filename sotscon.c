@@ -228,7 +228,7 @@ static void update_all_timeouts(void)
             } else {
                 //mark the board as invalid and report it as maybe dead
                 boards[i].valid = false;
-                report_error(BOARD_UNIQUE_ID, E_BOARD_FEARED_DEAD, 0, 0, 0, 0);
+                report_error(BOARD_UNIQUE_ID, E_BOARD_FEARED_DEAD, i, 0, 0, 0);
             }
         }
     }

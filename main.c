@@ -11,6 +11,7 @@
 #include "sotscon_sender.h"
 #include "radio_handler.h"
 #include "bus_power.h"
+#include "timing_util.h"
 
 #include <string.h>
 
@@ -37,11 +38,14 @@ int main()
 {
     //initialization functions
     init_pins();
+    LED_1_ON();
     init_oscillator();
+    LED_2_ON();
     init_adc();
     init_timer0();
     init_interrupts();
     init_uart();
+    LED_3_ON();
     init_sotscon();
     rcvb_init(can_receive_buffer, sizeof(can_receive_buffer));
 
@@ -50,14 +54,7 @@ int main()
     LED_3_OFF();
 
     can_timing_t timing;
-    timing.brp = 11;
-    timing.sjw = 3;
-    timing.sam = 0;
-    timing.seg1ph = 4;
-    timing.seg2ph = 4;
-    timing.prseg = 0;
-    timing.btlmode = true;
-
+    can_generate_timing_params(_XTAL_FREQ, &timing);
     can_init(&timing, &can_message_callback);
 
     LED_3_OFF();
