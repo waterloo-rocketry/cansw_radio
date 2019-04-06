@@ -2,6 +2,7 @@
 #include "analog.h"
 #include "canlib/pic18f26k83/pic18f26k83_can.h"
 #include "pic18_time.h"
+#include "uart.h"
 #include <xc.h>
 #include <stdint.h>
 
@@ -33,6 +34,10 @@ void __interrupt() isr()
     } else if (PIE3bits.TMR0IE == 1 && PIR3bits.TMR0IF == 1) {
         timer0_handle_interrupt();
         PIR3bits.TMR0IF = 0;
+    } else if (PIR3 & 0x78) {
+        //it's one of the UART1 interrupts, let them handle it
+        uart_interrupt_handler();
+        //that function is responsible for clearing PIR3
     } else {
         //unhandled interrupt. No idea what to do here, so just infinite loop
         while (1);

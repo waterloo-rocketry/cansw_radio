@@ -10,8 +10,6 @@ void init_oscillator(void);
 //set up the ADC
 void init_adc(void);
 
-void init_uart(void);
-
 //set up timer 0, which is used for millis() function
 void init_timer0(void);
 
