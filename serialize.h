@@ -67,7 +67,8 @@ bool serialize_state(const system_state *state, char *str);
 bool deserialize_state(system_state *state, const char *str);
 
 /*
- *
+ * This function serializes an error message for transmission over radio.
+ * Returns true if it successfully serialized a state and false otherwise.
  */
 bool serialize_error(const error_t *err, char *str);
 

@@ -71,11 +71,75 @@ bool deserialize_state(system_state *state, const char *str) {
 }
 
 bool serialize_error(const error_t *err, char *str) {
-    return false;
+    if(err == NULL) return false;
+    if(str == NULL) return false;
+
+    // A temporary variable to store the values to be Base64-encoded
+    uint8_t temp = 0;
+
+    // The board ID is is given 4 bits
+    temp = (err->board_id & 0b00001111) << 2;
+    // The error type is given 6 bits
+    temp |= (err->err_type & 0b00110000) >> 4;
+    str[0] = binary_to_base64(temp);
+
+    temp = (err->err_type & 0b00001111) << 2;
+    temp |= (err->byte4 & 0b11000000) >> 6;
+    str[1] = binary_to_base64(temp);
+
+    temp = (err->byte4 & 0b00111111);
+    str[2] = binary_to_base64(temp);
+
+    temp = (err->byte5 & 0b11111100) >> 2;
+    str[3] = binary_to_base64(temp);
+
+    temp = (err->byte5 & 0b00000011) << 4;
+    temp |= (err->byte6 & 0b11110000) >> 4;
+    str[4] = binary_to_base64(temp);
+
+    temp = (err->byte6 & 0b00001111) << 2;
+    temp |= (err->byte7 & 0b11000000) >> 6;
+    str[5] = binary_to_base64(temp);
+
+    temp = (err->byte7 & 0b00111111);
+    str[6] = binary_to_base64(temp);
+
+    str[7] = 0;
+
+    return true;
 }
 
 bool deserialize_error(error_t *err, const char *str) {
-    return false;
+    if(err == NULL) return false;
+    if(str == NULL) return false;
+
+    // A temporary variable to store decoded values
+    uint8_t temp = 0;
+
+    temp = base64_to_binary(str[0]);
+    err->board_id = (temp & 0b00111100) >> 2;
+    err->err_type = (temp & 0b00000011) << 4;
+
+    temp = base64_to_binary(str[1]);
+    err->err_type |= (temp & 0b00111100) >> 2;
+    err->byte4 = (temp & 0b00000011) << 6;
+
+    temp = base64_to_binary(str[2]);
+    err->byte4 |= (temp & 0b00111111);
+
+    temp = base64_to_binary(str[3]);
+    err->byte5 = (temp & 0b00111111) << 2;
+
+    temp = base64_to_binary(str[4]);
+    err->byte5 |= (temp & 0b00110000) >> 4;
+    err->byte6 = (temp & 0b00001111) << 4;
+
+    temp = base64_to_binary(str[5]);
+    err->byte6 |= (temp & 0b00111100) >> 2;
+    err->byte7 = (temp & 0b00000011) << 6;
+
+    temp = base64_to_binary(str[6]);
+    err->byte7 |= (temp & 0b00111111);
 }
 
 bool compare_system_states(const system_state *s, const system_state *p) {
