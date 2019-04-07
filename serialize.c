@@ -185,7 +185,7 @@ char checksum(char *cmd) {
         for(uint8_t i = 0; i < 4; ++i) {
             odd_sum += 0b00000010 & curr;
             even_sum += 0b00000001 & curr;
-            curr >> 2;
+            curr = curr >> 2;
         }
         total += odd_sum + 3 * even_sum;
         ++idx;
