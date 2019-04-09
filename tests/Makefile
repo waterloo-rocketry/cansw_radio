@@ -1,7 +1,6 @@
 
 objects = serialize.o
 objects+= radio_handler.o
-objects+= pic18_time.o
 objects+= error.o
 
 CFLAGS+="-I.."

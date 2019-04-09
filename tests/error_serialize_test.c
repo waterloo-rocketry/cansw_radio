@@ -4,6 +4,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+//pic18_time.c depends on xc.h, so we can't use its millis function
+//just declare a fake one, we don't really need it for these tests
+uint32_t millis(void) { return 0; }
+
 #define COLOR_GREEN "\x1B[32m"
 #define COLOR_RED   "\x1B[31m"
 #define COLOR_NONE  "\x1B[0m"
