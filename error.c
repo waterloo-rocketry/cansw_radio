@@ -1,4 +1,5 @@
 #include "error.h"
+#include "serialize.h"
 
 
 static char err_msg_ring_buf[ERROR_MESSAGE_RING_BUFFER_SIZE]
