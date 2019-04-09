@@ -5,9 +5,8 @@
 #include <stdint.h>
 
 /*
- * If we haven't gotten any radio commands in the last 10 seconds, go to safe
- * state. The "safe state" here just means "open the vent valve", but we may
- * someday have other safe state stuff
+ * The maximum allowable time between received messages.
+ * After this time, the vent valve is automatically opened.
  */
 #define TIME_NO_CONTACT_BEFORE_SAFE_STATE 10000
 

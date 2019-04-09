@@ -1,44 +1,73 @@
 #include "radio_handler.h"
+#include "serialize.h"
+#include "pic18_time.h" // for millis()
+#include <string.h> // for memcpy
 
-#include "pic18_time.h" // remove this
+static enum VALVE_STATE inj_valve_state = VALVE_UNK;
+static enum VALVE_STATE vent_valve_state = VALVE_OPEN;
+
+static uint32_t last_contact_millis = 0;
 
 enum VALVE_STATE radio_get_expected_inj_valve_state(void)
 {
-    /* This function currently just changes the inj valve state from open to
-     * closed with a rate of 1Hz. This is for debugging, don't actually launch
-     * a rocket with this going
-     */
-    static uint32_t counter = 0;
-    if (millis() - counter > 2000) {
-        counter = millis();
-    }
-
-    if (millis() - counter < 1000) {
-        return VALVE_OPEN;
-    } else {
-        return VALVE_CLOSED;
-    }
+    return inj_valve_state;
 }
 
 enum VALVE_STATE radio_get_expected_vent_valve_state(void)
 {
-    /* This function currently just changes the vent valve state from open to
-     * closed with a rate of 3Hz. This is for debugging, don't actually launch
-     * a rocket with this going
-     */
-    static uint32_t counter = 0;
-    if (millis() - counter > 666) {
-        counter = millis();
-    }
-
-    if (millis() - counter < 333) {
+    // Return VALVE_OPEN, regardless of vent_valve_state,
+    // if we haven't received any complete messages in a while
+    uint32_t time_since_last_contact = millis() - last_contact_millis;
+    if(time_since_last_contact >= TIME_NO_CONTACT_BEFORE_SAFE_STATE) {
         return VALVE_OPEN;
-    } else {
-        return VALVE_CLOSED;
     }
+    return vent_valve_state;
 }
 
 void radio_handle_input_character(uint8_t c)
 {
-    //TODO
+    static char message[STATE_COMMAND_LEN] = {0};
+    static uint8_t chars_received = 0;
+
+    if(c == STATE_COMMAND_HEADER) {
+        chars_received = 1;
+        message[0] = STATE_COMMAND_HEADER;
+    }
+
+    else if(chars_received == STATE_COMMAND_LEN - 2) {
+        // Only STATE_COMMAND_LEN - 1 characters are actually transmitted
+        // in each message (the null terminator is left out).
+        // This means that this character is the checksum.
+
+        // The checksum only includes the serialized state bytes.
+        // As such, we shouldn't include the { in it.
+        char actual_checksum = checksum(message + 1);
+        if(actual_checksum == c) {
+            // The message was correctly received
+            char serialized[SERIALIZED_OUTPUT_LEN];
+            memcpy(serialized, message + 1, SERIALIZED_OUTPUT_LEN - 1);
+            serialized[SERIALIZED_OUTPUT_LEN - 1] = 0;
+            system_state state;
+            deserialize_state(&state, serialized);
+            inj_valve_state = state.injector_valve_open ? VALVE_OPEN
+                : VALVE_CLOSED;
+            vent_valve_state = state.vent_valve_open ? VALVE_OPEN
+                : VALVE_CLOSED;
+            last_contact_millis = millis();
+        }
+        else {
+            // Discard this message
+            chars_received = 0;
+        }
+    }
+
+    else {
+        // This character is in the middle of a message.
+        // Check that we've received the starting character first.
+        if(chars_received > 0) {
+            message[chars_received] = c;
+            ++chars_received;
+        }
+        // Otherwise, simply discard the character.
+    }
 }
