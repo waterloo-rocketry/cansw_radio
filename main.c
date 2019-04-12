@@ -12,6 +12,7 @@
 #include "radio_handler.h"
 #include "bus_power.h"
 #include "timing_util.h"
+#include "can_tx_buffer.h"
 
 #include <string.h>
 
@@ -33,6 +34,7 @@ void can_message_callback(const can_msg_t *msg)
 
 //enough space to buffer 10 CAN messages
 uint8_t can_receive_buffer[140];
+uint8_t can_transmit_buffer[140];
 
 int main()
 {
@@ -48,6 +50,7 @@ int main()
     LED_3_ON();
     init_sotscon();
     rcvb_init(can_receive_buffer, sizeof(can_receive_buffer));
+    txb_init(can_transmit_buffer, sizeof(can_transmit_buffer), &can_send, &can_send_rdy);
 
     LED_1_OFF();
     LED_2_OFF();
@@ -85,6 +88,7 @@ int main()
 
         bus_power_heartbeat();
         analog_heartbeat();
+        txb_heartbeat();
     }
 
     //unreachable

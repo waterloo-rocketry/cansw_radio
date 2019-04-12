@@ -1,6 +1,7 @@
 #include "sotscon_sender.h"
 #include "message_types.h"
 #include "can_common.h"
+#include "can_tx_buffer.h"
 #include "pic18f26k83_can.h"
 #include "radio_handler.h"
 #include "sotscon.h"
@@ -50,7 +51,7 @@ static void rl_send_vent_valve_cmd(enum VALVE_STATE s)
                             &valve_cmd)) {
         report_error(BOARD_UNIQUE_ID, E_SEGFAULT, 0, 0, 0, 0);
     } else {
-        can_send(&valve_cmd, 0);
+        txb_enqueue(&valve_cmd);
     }
 
     time_last_vent_valve_cmd = millis();
@@ -70,7 +71,7 @@ static void rl_send_inj_valve_cmd(enum VALVE_STATE s)
                             &valve_cmd)) {
         report_error(BOARD_UNIQUE_ID, E_SEGFAULT, 0, 0, 0, 0);
     } else {
-        can_send(&valve_cmd, 0);
+        txb_enqueue(&valve_cmd);
     }
 
     time_last_inj_valve_cmd = millis();

@@ -32,7 +32,6 @@ void report_error(uint8_t board_id,
 
 bool get_next_serialized_error(char *output)
 {
-    if(err_msg_ring_buf == NULL) return false;
     if(err_msg_buf_size == 0) return false;
 
     char *serialized_error = err_msg_ring_buf[err_msg_buf_read];

@@ -140,6 +140,8 @@ bool deserialize_error(error_t *err, const char *str) {
 
     temp = base64_to_binary(str[6]);
     err->byte7 |= (temp & 0b00111111);
+
+    return true;
 }
 
 bool compare_system_states(const system_state *s, const system_state *p) {

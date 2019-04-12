@@ -4,6 +4,7 @@
 #include "message_types.h"
 #include "pic18_time.h"
 #include "can_common.h"
+#include "can_tx_buffer.h"
 #include <xc.h>
 
 /*
@@ -111,7 +112,7 @@ void trigger_bus_shutdown(void)
             build_general_cmd_msg(micros(),
                                   BUS_DOWN_WARNING,
                                   &power_down_warning);
-            can_send(&power_down_warning, 0);
+            txb_enqueue(&power_down_warning);
             break;
         default:
             //unhandled case. TODO, handle it
