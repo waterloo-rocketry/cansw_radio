@@ -89,6 +89,7 @@ int main()
         bus_power_heartbeat();
         analog_heartbeat();
         txb_heartbeat();
+        radio_heartbeat();
     }
 
     //unreachable

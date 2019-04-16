@@ -39,4 +39,10 @@ enum VALVE_STATE radio_get_expected_vent_valve_state(void);
 
 void radio_handle_input_character(uint8_t c);
 
+/*
+ * Checks if we need to send an error message over UART. Call every loop
+ * through the application code
+ */
+void radio_heartbeat(void);
+
 #endif

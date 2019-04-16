@@ -23,6 +23,14 @@
  * This character indicates the beginning of a state command.
  */
 #define STATE_COMMAND_HEADER '{'
+/*
+ * This character means "hey radio board, send your current state"
+ */
+#define STATE_REQUEST_HEADER '}'
+/*
+ * This character indicates the beginning of a error message
+ */
+#define ERROR_COMMAND_HEADER '!'
 
 /*
  * This type contains all of the information that needs to be shared between
