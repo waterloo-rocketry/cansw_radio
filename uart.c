@@ -5,6 +5,11 @@
 #include "error.h"
 #include "message_types.h"
 
+//needed for sending all data out over CAN as well as UART
+#include "can.h"
+#include "can_common.h"
+#include "can_tx_buffer.h"
+
 //safe ring buffers for sending and receiving
 static srb_ctx_t rx_buffer;
 static srb_ctx_t tx_buffer;
@@ -67,6 +72,21 @@ void uart_transmit_byte(uint8_t tx)
         srb_pop(&tx_buffer, &tx);
         U1TXB = tx;
         U1CON0bits.TXEN = 1;
+    }
+
+    //we want to send all of the bytes that we're sending over radio over
+    //CAN as well. To do so we buffer these bytes until we have 8 of them,
+    //then we send them all at once. Yes this means that a byte could be
+    //not delivered for a while, but it's fine, since this is only for debug,
+    //and we don't really care about latency
+    static char debug_printf_data[9];
+    static uint8_t debug_printf_data_len = 0;
+    debug_printf_data[debug_printf_data_len++] = (char) tx;
+    if (debug_printf_data_len == 8) {
+        debug_printf_data[8] = '\0';
+        can_msg_t to_send;
+        build_printf_can_message(debug_printf_data, &to_send);
+        txb_enqueue(&to_send);
     }
 }
 

@@ -68,8 +68,8 @@ int main()
             radio_handle_input_character(uart_read_byte());
         }
 
-        // We check for CAN messages regardles of whether the bus is powered.
-        // It's possible that the debug header is trying to tell us something,
+        // We check for CAN messages regardless of whether the bus is powered.
+        // It's possible that the debug board is trying to tell us something,
         // and we should really listen to that
         if (!rcvb_is_empty()) {
             can_msg_t msg;

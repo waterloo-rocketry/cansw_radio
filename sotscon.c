@@ -3,6 +3,7 @@
 #include "message_types.h"
 #include "pic18_time.h"
 #include "error.h"
+#include "radio_handler.h"
 
 /* File local macros */
 
@@ -84,6 +85,7 @@ void init_sotscon(void)
 
 void handle_incoming_can_message(const can_msg_t *msg)
 {
+    uint8_t i; //used for MSG_DEBUG_RADIO_CMD, can't declare in case statement
     uint8_t sender_unique_id = get_board_unique_id(msg);
     if (sender_unique_id > MAX_BOARD_UNIQUE_ID) {
         report_error(BOARD_UNIQUE_ID, E_ILLEGAL_CAN_MSG, 0, 0, 0, 0);
@@ -174,6 +176,16 @@ void handle_incoming_can_message(const can_msg_t *msg)
             case MSG_LEDS_ON:
             case MSG_LEDS_OFF:
                 break;
+
+            /* We treat all the bytes in the debug_radio_cmd message as though
+               we just received them from the radio. ie we hand them to the
+               radio handler */
+            case MSG_DEBUG_RADIO_CMD:
+                for (i = 0; i < msg->data_len; ++i) {
+                    radio_handle_input_character(msg->data[i]);
+                }
+                break;
+
             /* We have provided cases for every message type in the spreadsheet,
                so if we get to the default case, that either means that one of
                the boards is sending a SID that it shouldn't be, or that we added
