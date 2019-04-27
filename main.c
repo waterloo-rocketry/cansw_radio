@@ -62,6 +62,8 @@ int main()
 
     LED_3_OFF();
 
+    trigger_bus_powerup();
+
     //program loop
     while (1) {
         if (uart_byte_available()) {
