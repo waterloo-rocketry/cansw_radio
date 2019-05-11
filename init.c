@@ -63,27 +63,27 @@ void init_pins(void)
     ANSELC = ( 0 << 7 | //XBEE_RESET
                0 << 6 | //XBEE_SLEEP
                0 << 5 | //NC
-               0 << 4 | //NC
+               0 << 4 | //BUS_EN_GND
                0 << 3 | //CANTX
                0 << 2 | //CANRX
                0 << 1 | //Debug LED 1
-               0 << 0); //NC
+               0 << 0); //BUS_EN_5V
     LATC   = ( 0 << 7 | //XBEE_RESET
                0 << 6 | //XBEE_SLEEP
                0 << 5 | //NC
-               0 << 4 | //NC
+               0 << 4 | //BUS_EN_GND
                0 << 3 | //CANTX
                0 << 2 | //CANRX
                0 << 1 | //Debug LED 1
-               0 << 0); //NC
+               0 << 0); //BUS_EN_5V
     TRISC  = ( 1 << 7 | //XBEE_RESET
                1 << 6 | //XBEE_SLEEP
                1 << 5 | //NC
-               1 << 4 | //NC
+               0 << 4 | //BUS_EN_GND
                0 << 3 | //CANTX
                1 << 2 | //CANRX
                0 << 1 | //Debug LED 1
-               1 << 0); //NC
+               0 << 0); //BUS_EN_5V
 
     //setup CAN output pins
     //CANRX on RC2

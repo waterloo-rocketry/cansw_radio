@@ -41,12 +41,16 @@ static uint32_t time_last_state_transition;
 
 static void power_bus(void)
 {
-    LATA2 = 1;
+    LATA2 = 1; // 12V EN
+    LATC0 = 1; //  5V EN
+    LATC4 = 1; // GND EN
 }
 
 static void depower_bus(void)
 {
     LATA2 = 0;
+    LATC0 = 0;
+    LATC4 = 0;
 }
 
 void init_bus_power(void)
