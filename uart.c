@@ -21,13 +21,13 @@ void init_uart(void)
 {
     //set RX pin location
     U1RXPPS = (0b001 << 3) | //port B
-              (0b100);       // pin 4
+              (0b011);       // pin 3
     //set CTS pin location
     U1CTSPPS = (0b001 << 3) |
                (0b001);
 
     //set the TX pin location
-    RB3PPS = 0b010011;
+    RB4PPS = 0b010011;
     //set the RTS pin location
     RB2PPS = 0b010101;
 
@@ -58,9 +58,10 @@ void init_uart(void)
     srb_init(&rx_buffer, rx_buffer_pool, sizeof(rx_buffer_pool), sizeof(uint8_t));
     srb_init(&tx_buffer, tx_buffer_pool, sizeof(tx_buffer_pool), sizeof(uint8_t));
 
-    //enable interrupts
-    PIR3bits.U1TXIF = 1;
-    PIR3bits.U1RXIF = 1;
+    //enable receive interrupt
+    PIE3bits.U1RXIE = 1;
+    //Do not enable transmit interrupt, that interrupt enable signals that
+    //there is data to be sent, which at init time is not true
 }
 
 void uart_transmit_byte(uint8_t tx)
@@ -68,10 +69,12 @@ void uart_transmit_byte(uint8_t tx)
     //push this byte to ensure ordering
     srb_push(&tx_buffer, &tx);
     //If the module isn't enabled, give it a byte to send and enable it
-    if (U1CON0bits.TXEN == 0) {
+    if (PIE3bits.U1TXIE == 0) {
         srb_pop(&tx_buffer, &tx);
         U1TXB = tx;
         U1CON0bits.TXEN = 1;
+        //also enable the interrupt for when it's ready to send more data
+        PIE3bits.U1TXIE = 1;
     }
 
     //we want to send all of the bytes that we're sending over radio over
@@ -121,6 +124,8 @@ void uart_interrupt_handler(void)
             srb_pop(&tx_buffer, &tx);
             U1TXB = tx;
         } else {
+            // If we have no data to send, disable this interrupt
+            PIE3bits.U1TXIE = 0;
             //if not, disable the TX part of the uart module so that TXIF
             //isn't triggered again and so that we reenable the module on
             //the next call to uart_transmit_byte

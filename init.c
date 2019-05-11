@@ -38,24 +38,24 @@ void init_pins(void)
     ANSELB = ( 1 << 7 | //ICSPDAT (otherwise unused)
                1 << 6 | //ICSPCLK (otherwise unused)
                1 << 5 | //NC pin
-               0 << 4 | //UART_RX
-               0 << 3 | //UART_TX
+               0 << 4 | //UART_TX
+               0 << 3 | //UART_RX
                0 << 2 | //~UART_RTS
                0 << 1 | //~UART_CTS
                1 << 0); //NC pin
     LATB   = ( 0 << 7 | //ICSPDAT (otherwise unused)
                0 << 6 | //ICSPCLK (otherwise unused)
                0 << 5 | //NC pin
-               0 << 4 | //UART_RX
-               0 << 3 | //UART_TX
-               1 << 2 | //~UART_RTS
+               0 << 4 | //UART_TX
+               0 << 3 | //UART_RX
+               0 << 2 | //~UART_RTS
                0 << 1 | //~UART_CTS
                0 << 0); //NC pin
     TRISB  = ( 1 << 7 | //ICSPDAT (otherwise unused)
                1 << 6 | //ICSPCLK (otherwise unused)
                1 << 5 | //NC pin
-               1 << 4 | //UART_RX
-               0 << 3 | //UART_TX
+               0 << 4 | //UART_TX
+               1 << 3 | //UART_RX
                0 << 2 | //~UART_RTS
                1 << 1 | //~UART_CTS
                1 << 0); //NC pin
