@@ -3,6 +3,7 @@
 #include "sotscon.h"
 #include "uart.h"
 #include "pic18_time.h" // for millis()
+#include "bus_power.h"
 #include <string.h> // for memcpy
 
 static enum VALVE_STATE inj_valve_state = VALVE_UNK;
@@ -40,7 +41,7 @@ void radio_handle_input_character(uint8_t c)
         current_state.injector_valve_open = (current_inj_valve_position() ==
                                              VALVE_OPEN);
         current_state.vent_valve_open = (current_vent_valve_position() == VALVE_OPEN);
-        current_state.running_self_test = false; // we don't actually use this
+        current_state.bus_is_powered = is_bus_powered();
         current_state.any_errors_detected = any_errors_active();
         create_state_command(state_to_send, &current_state);
         uart_transmit_buffer((uint8_t *) state_to_send, STATE_COMMAND_LEN - 1);
@@ -66,6 +67,13 @@ void radio_handle_input_character(uint8_t c)
                               : VALVE_CLOSED;
             vent_valve_state = state.vent_valve_open ? VALVE_OPEN
                                : VALVE_CLOSED;
+            /* control whether the bus is powered */
+            if(state.bus_is_powered) {
+                trigger_bus_powerup();
+            } else {
+                trigger_bus_shutdown();
+            }
+
             last_contact_millis = millis();
         } else {
             // Discard this message

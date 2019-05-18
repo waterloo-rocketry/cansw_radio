@@ -40,7 +40,7 @@ typedef struct {
     uint8_t num_boards_connected;
     bool injector_valve_open;
     bool vent_valve_open;
-    bool running_self_test;
+    bool bus_is_powered;
     bool any_errors_detected;
 } system_state;
 

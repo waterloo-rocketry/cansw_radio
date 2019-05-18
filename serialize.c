@@ -36,8 +36,8 @@ bool serialize_state(const system_state *state, char *str) {
     str[0] = binary_to_base64(raw);
 
     raw = 0;
-    // Bit 5 represents whether self-testing is enabled
-    if(state->running_self_test) raw |= 0b00100000;
+    // Bit 5 represents whether the bus is should be powered
+    if(state->bus_is_powered) raw |= 0b00100000;
     // Bit 4 represents whether errors have been detected
     if(state->any_errors_detected) raw |= 0b00010000;
     str[1] = binary_to_base64(raw);
@@ -62,8 +62,8 @@ bool deserialize_state(system_state *state, const char *str) {
 
     raw = base64_to_binary(str[1]);
 
-    // Bit 5 represents whether self-testing is enabled
-    state->running_self_test = raw & 0b00100000;
+    // Bit 5 represents whether the bus should be powered is enabled
+    state->bus_is_powered = raw & 0b00100000;
     // Bit 4 represents whether errors have been detected
     state->any_errors_detected = raw & 0b00010000;
 
@@ -151,7 +151,7 @@ bool compare_system_states(const system_state *s, const system_state *p) {
     if(s->num_boards_connected != p->num_boards_connected) return false;
     if(s->injector_valve_open != p->injector_valve_open) return false;
     if(s->vent_valve_open != p->vent_valve_open) return false;
-    if(s->running_self_test != p->running_self_test) return false;
+    if(s->bus_is_powered != p->bus_is_powered) return false;
     if(s->any_errors_detected != p->any_errors_detected) return false;
 
     return true;
