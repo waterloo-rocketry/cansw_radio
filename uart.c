@@ -100,6 +100,10 @@ void uart_transmit_buffer(uint8_t *tx, uint8_t len)
         uart_transmit_byte(*tx);
         tx++;
     }
+    //for some reason the last byte of uart_transmit_byte isn't being
+    //sent until the next byte is queued. No idea why this happens, but
+    //hacky fix for now is to just transmit a nothing byte after each buffer
+    uart_transmit_byte(' ');
 }
 
 bool uart_byte_available(void)

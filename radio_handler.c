@@ -92,6 +92,7 @@ void radio_heartbeat(void)
         char error_msg_to_send[ERROR_COMMAND_LENGTH + 2];
         if (get_next_serialized_error(error_msg_to_send + 1)) {
             error_msg_to_send[0] = ERROR_COMMAND_HEADER;
+            error_msg_to_send[ERROR_COMMAND_LENGTH] = '\0'; //make sure doesn't read past here
             error_msg_to_send[ERROR_COMMAND_LENGTH] = checksum(error_msg_to_send);
             error_msg_to_send[ERROR_COMMAND_LENGTH + 1] = '\0';
             uart_transmit_buffer((uint8_t *) error_msg_to_send, ERROR_COMMAND_LENGTH + 1);
