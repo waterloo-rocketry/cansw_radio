@@ -39,9 +39,8 @@ void radio_handle_input_character(uint8_t c)
         system_state current_state;
         current_state.tank_pressure = current_tank_pressure();
         current_state.num_boards_connected = current_num_boards_connected();
-        current_state.injector_valve_open = (current_inj_valve_position() ==
-                                             VALVE_OPEN);
-        current_state.vent_valve_open = (current_vent_valve_position() == VALVE_OPEN);
+        current_state.injector_valve_state = current_inj_valve_position();
+        current_state.vent_valve_state = current_vent_valve_position();
         current_state.bus_is_powered = is_bus_powered();
         current_state.any_errors_detected = any_errors_active();
         create_state_command(state_to_send, &current_state);
@@ -64,12 +63,10 @@ void radio_handle_input_character(uint8_t c)
             serialized[SERIALIZED_OUTPUT_LEN - 1] = 0;
             system_state state;
             deserialize_state(&state, serialized);
-            inj_valve_state = state.injector_valve_open ? VALVE_OPEN
-                              : VALVE_CLOSED;
-            vent_valve_state = state.vent_valve_open ? VALVE_OPEN
-                               : VALVE_CLOSED;
+            inj_valve_state = state.injector_valve_state;
+            vent_valve_state = state.vent_valve_state;
             /* control whether the bus is powered */
-            if(state.bus_is_powered) {
+            if (state.bus_is_powered) {
                 trigger_bus_powerup();
             } else {
                 trigger_bus_shutdown();
@@ -101,7 +98,9 @@ void radio_heartbeat(void)
         char error_msg_to_send[ERROR_COMMAND_LENGTH + 2];
         if (get_next_serialized_error(error_msg_to_send + 1)) {
             error_msg_to_send[0] = ERROR_COMMAND_HEADER;
-            error_msg_to_send[ERROR_COMMAND_LENGTH] = '\0'; //make sure doesn't read past here
+
+            //make sure doesn't read past here
+            error_msg_to_send[ERROR_COMMAND_LENGTH] = '\0';
             error_msg_to_send[ERROR_COMMAND_LENGTH] = checksum(error_msg_to_send);
             error_msg_to_send[ERROR_COMMAND_LENGTH + 1] = '\0';
             uart_transmit_buffer((uint8_t *) error_msg_to_send, ERROR_COMMAND_LENGTH + 1);

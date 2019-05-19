@@ -168,7 +168,7 @@ void handle_incoming_can_message(const can_msg_t *msg)
             case MSG_SENSOR_ANALOG:
                 if (msg->data[2] == SENSOR_PRESSURE) {
                     // we have a pressure, update the pressure
-                    last_pressure = ((uint16_t) msg->data[3] << 8) | msg->data[4];
+                    last_tank_pressure = ((uint16_t) msg->data[3] << 8) | msg->data[4];
                 }
                 boards[sender_unique_id].valid = true;
                 boards[sender_unique_id].time_last_message_received_ms = millis();

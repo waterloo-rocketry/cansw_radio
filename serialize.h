@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include "error.h"
+#include "message_types.h"
 
 /*
  * This macro defines how long (in bytes) a string must be in order to
@@ -11,14 +12,14 @@
  * a serialized system state should have SERIALIZED_OUTPUT_LEN - 1 ascii
  * characters in it
  */
-#define SERIALIZED_OUTPUT_LEN 4
+#define SERIALIZED_OUTPUT_LEN 5
 /*
  * Length of a state command. A state command is a block of characters
  * that can be sent over the radio. It's mostly the serialized state output
  * with a couple of additional bytes for STATE_COMMAND header and for a
  * CRC or hamming code
  */
-#define STATE_COMMAND_LEN 6
+#define STATE_COMMAND_LEN 7
 /*
  * This character indicates the beginning of a state command.
  */
@@ -39,8 +40,8 @@
 typedef struct {
     uint16_t tank_pressure;
     uint8_t num_boards_connected;
-    bool injector_valve_open;
-    bool vent_valve_open;
+    enum VALVE_STATE injector_valve_state;
+    enum VALVE_STATE vent_valve_state;
     bool bus_is_powered;
     bool any_errors_detected;
 } system_state;
