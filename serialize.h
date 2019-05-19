@@ -11,14 +11,14 @@
  * a serialized system state should have SERIALIZED_OUTPUT_LEN - 1 ascii
  * characters in it
  */
-#define SERIALIZED_OUTPUT_LEN 3
+#define SERIALIZED_OUTPUT_LEN 4
 /*
  * Length of a state command. A state command is a block of characters
  * that can be sent over the radio. It's mostly the serialized state output
  * with a couple of additional bytes for STATE_COMMAND header and for a
  * CRC or hamming code
  */
-#define STATE_COMMAND_LEN 5
+#define STATE_COMMAND_LEN 6
 /*
  * This character indicates the beginning of a state command.
  */
@@ -37,6 +37,7 @@
  * the operator on the ground and the CAN system in the rocket.
  */
 typedef struct {
+    uint16_t tank_pressure;
     uint8_t num_boards_connected;
     bool injector_valve_open;
     bool vent_valve_open;

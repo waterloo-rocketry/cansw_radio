@@ -76,4 +76,12 @@ uint8_t current_num_boards_connected(void);
  */
 bool any_errors_active(void);
 
+/*
+ * Returns the tank pressure that we last received from minisensor. If we've
+ * never received a reading from minisensor, this will return 0. This function
+ * clamps its return value to 999, so if the pressure is above that, we won't
+ * be able to read it. Is this a problem re: the burst disk? Maybe.
+ */
+uint16_t current_tank_pressure(void);
+
 #endif

@@ -62,6 +62,11 @@ static uint8_t connected_boards = 0;
  */
 static bool errors_active = false;
 
+/*
+ * Every time we get a pressure reading from sensor, put it here
+ */
+static uint16_t last_tank_pressure = 0;
+
 /* Private function declarations */
 static void update_all_timeouts(void);
 static void update_errors_active(void);
@@ -157,6 +162,17 @@ void handle_incoming_can_message(const can_msg_t *msg)
                 }
                 break;
 
+            /* Handle this message by updating last_tank_pressure, then updating last
+             * time we've heard from that board
+             */
+            case MSG_SENSOR_ANALOG:
+                if (msg->data[2] == SENSOR_PRESSURE) {
+                    // we have a pressure, update the pressure
+                    last_pressure = ((uint16_t) msg->data[3] << 8) | msg->data[4];
+                }
+                boards[sender_unique_id].valid = true;
+                boards[sender_unique_id].time_last_message_received_ms = millis();
+                break;
             /* Handle these messages by updating the last time since we've
                heard from the sender, but otherwise take no action */
             case MSG_VENT_VALVE_CMD:
@@ -164,7 +180,6 @@ void handle_incoming_can_message(const can_msg_t *msg)
             case MSG_SENSOR_ACC:
             case MSG_SENSOR_GYRO:
             case MSG_SENSOR_MAG:
-            case MSG_SENSOR_ANALOG:
             case MSG_GENERAL_CMD:
                 boards[sender_unique_id].valid = true;
                 boards[sender_unique_id].time_last_message_received_ms = millis();
@@ -219,6 +234,15 @@ uint8_t current_num_boards_connected(void)
 bool any_errors_active(void)
 {
     return errors_active;
+}
+
+uint16_t current_tank_pressure(void)
+{
+    if (last_tank_pressure > 999) {
+        return 999;
+    } else {
+        return last_tank_pressure;
+    }
 }
 
 /* Private function definitions */

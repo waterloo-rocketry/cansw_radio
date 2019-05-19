@@ -37,6 +37,7 @@ void radio_handle_input_character(uint8_t c)
         //we need to serialize our current state and send it over the radio
         char state_to_send[STATE_COMMAND_LEN];
         system_state current_state;
+        current_state.tank_pressure = current_tank_pressure();
         current_state.num_boards_connected = current_num_boards_connected();
         current_state.injector_valve_open = (current_inj_valve_position() ==
                                              VALVE_OPEN);
