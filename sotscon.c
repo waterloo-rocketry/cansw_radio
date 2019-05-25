@@ -170,7 +170,7 @@ void handle_incoming_can_message(const can_msg_t *msg)
              * time we've heard from that board
              */
             case MSG_SENSOR_ANALOG:
-                if (msg->data[2] == SENSOR_PRESSURE) {
+                if (msg->data[2] == SENSOR_PRESSURE_OX) {
                     // we have a pressure, update the pressure
                     last_tank_pressure = ((uint16_t) msg->data[3] << 8) | msg->data[4];
                 }
