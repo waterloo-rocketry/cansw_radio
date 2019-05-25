@@ -52,11 +52,11 @@ bool serialize_state(const system_state *state, char *str)
     // Bits 5-4 represent vent valve state
     raw |= ((state->vent_valve_state & 0x3) << 4);
     // Bits 3-0 are the top bits 9-6 of the tank pressure
-    raw |= ((state->tank_pressure >> 6) & 0b1111);
+    raw |= ((state->tank_pressure >> 6) & 0xf);
     str[1] = binary_to_base64(raw);
 
     //use all the bits of this next one to hold bits 5-0 of tank pressure
-    raw = (state->tank_pressure & 0b00111111);
+    raw = (state->tank_pressure & 0x3f);
     str[2] = binary_to_base64(raw);
 
     raw = 0;
@@ -91,15 +91,11 @@ bool deserialize_state(system_state *state, const char *str)
 
     // Bits 5-4 represent vent valve state
     state->vent_valve_state = ((raw & 0x30) >> 4);
-    // Bit 5 represents whether the bus should be powered is enabled
-    state->bus_is_powered = raw & 0b00100000;
-    // Bit 4 represents whether errors have been detected
-    state->any_errors_detected = raw & 0b00010000;
     // Bit 3-0 are bits 9-6 of tank pressure
-    state->tank_pressure = ((uint16_t) (raw & 0b1111)) << 6;
+    state->tank_pressure = ((uint16_t) (raw & 0xf)) << 6;
 
     raw = base64_to_binary(str[2]);
-    state->tank_pressure |= (raw & 0b00111111);
+    state->tank_pressure |= (raw & 0x3f);
 
     raw = base64_to_binary(str[3]);
     // Bit 5 represents whether the bus should be powered

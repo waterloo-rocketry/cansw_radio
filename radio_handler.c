@@ -55,6 +55,7 @@ void radio_handle_input_character(uint8_t c)
 
         // The checksum only includes the serialized state bytes.
         // As such, we shouldn't include the { in it.
+        message[chars_received] = '\0';
         char actual_checksum = checksum(message + 1);
         if (actual_checksum == c) {
             // The message was correctly received
