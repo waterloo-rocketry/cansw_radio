@@ -130,14 +130,16 @@ void handle_incoming_can_message(const can_msg_t *msg)
                     vent_board_unique_id != 0) {
                     //this is very very bad. You cannot have 2 vent boards
                     report_error(BOARD_UNIQUE_ID, E_ILLEGAL_CAN_MSG, 0, 0, 0, 0);
-                } else if (msg->data[3] != VALVE_OPEN ||
-                           msg->data[3] != VALVE_CLOSED ||
-                           msg->data[3] != VALVE_UNK) {
+                } else if (msg->data[3] != VALVE_OPEN &&
+                           msg->data[3] != VALVE_CLOSED &&
+                           msg->data[3] != VALVE_UNK &&
+                           msg->data[3] != VALVE_ILLEGAL) {
                     //this is also bad, this is not a valid valve_state
                     report_error(BOARD_UNIQUE_ID, E_ILLEGAL_CAN_MSG, 0, 0, 0, 0);
                 } else {
                     //yay, we know the state now
                     vent_valve_state = msg->data[3];
+                    vent_board_unique_id = sender_unique_id;
                 }
                 break;
 
@@ -151,14 +153,16 @@ void handle_incoming_can_message(const can_msg_t *msg)
                     inj_board_unique_id != 0) {
                     //this is very very bad. You cannot have 2 vent boards
                     report_error(BOARD_UNIQUE_ID, E_ILLEGAL_CAN_MSG, 0, 0, 0, 0);
-                } else if (msg->data[3] != VALVE_OPEN ||
-                           msg->data[3] != VALVE_CLOSED ||
-                           msg->data[3] != VALVE_UNK) {
+                } else if (msg->data[3] != VALVE_OPEN &&
+                           msg->data[3] != VALVE_CLOSED &&
+                           msg->data[3] != VALVE_UNK &&
+                           msg->data[3] != VALVE_ILLEGAL) {
                     //this is also bad, this is not a valid valve_state
                     report_error(BOARD_UNIQUE_ID, E_ILLEGAL_CAN_MSG, 0, 0, 0, 0);
                 } else {
                     //yay, we know the state now
                     inj_valve_state = msg->data[3];
+                    inj_board_unique_id = sender_unique_id;
                 }
                 break;
 
@@ -274,14 +278,14 @@ static void update_all_timeouts(void)
      * `inj_valve_state` and `vent_valve_state` based on that.
      */
     if (vent_board_unique_id == 0 || (!boards[vent_board_unique_id].valid) ||
-        (boards[vent_board_unique_id].time_last_message_received_ms - current_time_ms)
-        >= MIN_TIME_BETWEEN_VALVE_UPDATE_MS) {
-        //mark the vent valve state as invalid
+        ((current_time_ms - boards[vent_board_unique_id].time_last_message_received_ms)
+         >= MIN_TIME_BETWEEN_VALVE_UPDATE_MS)) {
         vent_valve_state = VALVE_UNK;
     }
+
     if (inj_board_unique_id == 0 || (!boards[inj_board_unique_id].valid) ||
-        (boards[inj_board_unique_id].time_last_message_received_ms - current_time_ms) >=
-        MIN_TIME_BETWEEN_VALVE_UPDATE_MS) {
+        ((current_time_ms - boards[inj_board_unique_id].time_last_message_received_ms)
+         >= MIN_TIME_BETWEEN_VALVE_UPDATE_MS)) {
         //mark the inj valve state as invalid
         inj_valve_state = VALVE_UNK;
     }
