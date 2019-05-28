@@ -45,6 +45,9 @@ void radio_handle_input_character(uint8_t c)
         current_state.any_errors_detected = any_errors_active();
         create_state_command(state_to_send, &current_state);
         uart_transmit_buffer((uint8_t *) state_to_send, STATE_COMMAND_LEN - 1);
+        // we've received a valid something from RLCS, so reset
+        // safe state timer
+        last_contact_millis = millis();
     } else if (c == STATE_COMMAND_HEADER) {
         chars_received = 1;
         message[0] = STATE_COMMAND_HEADER;

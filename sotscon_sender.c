@@ -14,6 +14,7 @@
 static void rl_send_vent_valve_cmd(enum VALVE_STATE s);
 static void rl_send_inj_valve_cmd(enum VALVE_STATE s);
 
+static uint32_t time_last_vent_valve_cmd = 0;
 
 /* Public function definitions */
 
@@ -29,7 +30,8 @@ void sotscon_heartbeat(void)
         rl_send_inj_valve_cmd(desired_inj);
     }
 
-    if (current_vent != desired_vent) {
+    if (current_vent != desired_vent ||
+        (millis() - time_last_vent_valve_cmd) >= 750) {
         rl_send_vent_valve_cmd(desired_vent);
     }
 }
@@ -37,7 +39,6 @@ void sotscon_heartbeat(void)
 
 /* Private function definitions */
 
-static uint32_t time_last_vent_valve_cmd = 0;
 static void rl_send_vent_valve_cmd(enum VALVE_STATE s)
 {
     if ((millis() - time_last_vent_valve_cmd) < MIN_TIME_BETWEEN_VALVE_CMD_MS) {
@@ -46,9 +47,9 @@ static void rl_send_vent_valve_cmd(enum VALVE_STATE s)
     }
     can_msg_t valve_cmd;
     if (!build_valve_cmd_msg(micros(),
-                            s,
-                            MSG_VENT_VALVE_CMD,
-                            &valve_cmd)) {
+                             s,
+                             MSG_VENT_VALVE_CMD,
+                             &valve_cmd)) {
         report_error(BOARD_UNIQUE_ID, E_SEGFAULT, 0, 0, 0, 0);
     } else {
         txb_enqueue(&valve_cmd);
@@ -66,9 +67,9 @@ static void rl_send_inj_valve_cmd(enum VALVE_STATE s)
     can_msg_t valve_cmd;
     uint8_t can_msg_data = s; //only one byte of data needed for valve commands
     if (!build_valve_cmd_msg(micros(),
-                            s,
-                            MSG_INJ_VALVE_CMD,
-                            &valve_cmd)) {
+                             s,
+                             MSG_INJ_VALVE_CMD,
+                             &valve_cmd)) {
         report_error(BOARD_UNIQUE_ID, E_SEGFAULT, 0, 0, 0, 0);
     } else {
         txb_enqueue(&valve_cmd);
