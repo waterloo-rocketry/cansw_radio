@@ -137,7 +137,7 @@ bool deserialize_state(system_state *state, const char *str)
     // Bits 5-2 represent bits 3-0 of the bus battery voltage
     state->bus_battery_voltage_mv |= (raw & 0x3c) >> 2;
     // Bits 1-0 represent bits 13-12 of the vent battery voltage
-    state->vent_battery_voltage_mv = (uint16_t) (raw &0x3) << 12;
+    state->vent_battery_voltage_mv = (uint16_t) (raw & 0x3) << 12;
 
     raw = base64_to_binary(str[6]);
     // Bits 5-0 represent bits 11-6 of the vent battery voltage
