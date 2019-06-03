@@ -19,7 +19,7 @@
  * with a couple of additional bytes for STATE_COMMAND header and for a
  * CRC or hamming code
  */
-#define STATE_COMMAND_LEN SERIALIZED_OUTPUT_LEN + 2
+#define STATE_COMMAND_LEN (SERIALIZED_OUTPUT_LEN + 2)
 /*
  * This character indicates the beginning of a state command.
  */
