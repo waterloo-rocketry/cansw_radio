@@ -67,6 +67,14 @@ static bool errors_active = false;
  */
 static uint16_t last_tank_pressure = 0;
 
+/*
+ * Keep track of the battery voltage for both the vent and injector valves
+ * (although injector valve battery is currently not being used). These
+ * voltages are in millivolts.
+ */
+static uint16_t vent_battery_voltage_mv = 0;
+static uint16_t inj_battery_voltage_mv = 0;
+
 /* Private function declarations */
 static void update_all_timeouts(void);
 static void update_errors_active(void);
@@ -173,6 +181,14 @@ void handle_incoming_can_message(const can_msg_t *msg)
                 if (msg->data[2] == SENSOR_PRESSURE_OX) {
                     // we have a pressure, update the pressure
                     last_tank_pressure = ((uint16_t) msg->data[3] << 8) | msg->data[4];
+                }
+                if (msg->data[2] == SENSOR_VENT_BATT) {
+                    // we have a vent battery voltage, update the battery voltage
+                    vent_battery_voltage_mv = (uint16_t) msg->data[3] << 8 | msg->data[4];
+                }
+                if (msg->data[2] == SENSOR_INJ_BATT) {
+                    // we have a inj battery voltage, update the battery voltage
+                    inj_battery_voltage_mv = (uint16_t) msg->data[3] << 8 | msg->data[4];
                 }
                 boards[sender_unique_id].valid = true;
                 boards[sender_unique_id].time_last_message_received_ms = millis();
