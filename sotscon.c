@@ -184,11 +184,11 @@ void handle_incoming_can_message(const can_msg_t *msg)
                 }
                 if (msg->data[2] == SENSOR_VENT_BATT) {
                     // we have a vent battery voltage, update the battery voltage
-                    vent_battery_voltage_mv = (uint16_t) msg->data[3] << 8 | msg->data[4];
+                    vent_battery_voltage_mv = ((uint16_t) msg->data[3] << 8) | msg->data[4];
                 }
                 if (msg->data[2] == SENSOR_INJ_BATT) {
                     // we have a inj battery voltage, update the battery voltage
-                    inj_battery_voltage_mv = (uint16_t) msg->data[3] << 8 | msg->data[4];
+                    inj_battery_voltage_mv = ((uint16_t) msg->data[3] << 8) | msg->data[4];
                 }
                 boards[sender_unique_id].valid = true;
                 boards[sender_unique_id].time_last_message_received_ms = millis();
