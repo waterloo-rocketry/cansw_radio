@@ -13,6 +13,7 @@
 #include "bus_power.h"
 #include "timing_util.h"
 #include "can_tx_buffer.h"
+#include "led_manager.h"
 
 #include <string.h>
 
@@ -51,6 +52,7 @@ int main()
     init_sotscon();
     rcvb_init(can_receive_buffer, sizeof(can_receive_buffer));
     txb_init(can_transmit_buffer, sizeof(can_transmit_buffer), &can_send, &can_send_rdy);
+    init_led_manager();
 
     LED_1_OFF();
     LED_2_OFF();
@@ -92,6 +94,8 @@ int main()
         analog_heartbeat();
         txb_heartbeat();
         radio_heartbeat();
+        led_manager_heartbeat();
+        __delay_ms(10);
     }
 
     //unreachable
