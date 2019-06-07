@@ -9,10 +9,10 @@
 
 /*
  * We key boards by their unique id. In theory there could be up to 32 of
- * these, but at present there are only 12 defined IDs, so we can have just
+ * these, but at present there are only 14 defined IDs, so we can have just
  * those.
  */
-#define MAX_BOARD_UNIQUE_ID 0x0C
+#define MAX_BOARD_UNIQUE_ID 0x0E
 
 /*
  * We keep track of how many consecutive E_NOMINAL general status messages
@@ -68,9 +68,8 @@ static bool errors_active = false;
 static uint16_t last_tank_pressure = 0;
 
 /*
- * Keep track of the battery voltage for both the vent and injector valves
- * (although injector valve battery is currently not being used). These
- * voltages are in millivolts.
+ * Keep track of the battery voltage for both the vent and injector valves.
+ * These voltages are in millivolts.
  */
 static uint16_t vent_battery_voltage_mv = 0;
 static uint16_t inj_battery_voltage_mv = 0;
@@ -263,6 +262,16 @@ uint16_t current_tank_pressure(void)
     } else {
         return last_tank_pressure;
     }
+}
+
+uint16_t current_vent_batt_mv(void)
+{
+    return vent_battery_voltage_mv;
+}
+
+uint16_t current_inj_batt_mv(void)
+{
+    return inj_battery_voltage_mv;
 }
 
 /* Private function definitions */
