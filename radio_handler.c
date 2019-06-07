@@ -37,12 +37,23 @@ void radio_handle_input_character(uint8_t c)
         //we need to serialize our current state and send it over the radio
         char state_to_send[STATE_COMMAND_LEN];
         system_state current_state;
+
         current_state.tank_pressure = current_tank_pressure();
         current_state.num_boards_connected = current_num_boards_connected();
         current_state.injector_valve_state = current_inj_valve_position();
         current_state.vent_valve_state = current_vent_valve_position();
         current_state.bus_is_powered = is_bus_powered();
         current_state.any_errors_detected = any_errors_active();
+        current_state.bus_battery_voltage_mv = current_inj_batt_mv();
+        current_state.vent_battery_voltage_mv = current_vent_batt_mv();
+
+        // Clamp battery voltages to 14 bits
+        if (current_state.bus_battery_voltage_mv > 0x3FFF)
+            current_state.bus_battery_voltage_mv = 0x3FFF;
+        if (current_state.vent_battery_voltage_mv > 0x3FFF)
+            current_state.vent_battery_voltage_mv = 0x3FFF;
+
+
         create_state_command(state_to_send, &current_state);
         uart_transmit_buffer((uint8_t *) state_to_send, STATE_COMMAND_LEN - 1);
         // we've received a valid something from RLCS, so reset

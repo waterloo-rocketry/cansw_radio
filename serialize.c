@@ -55,7 +55,7 @@ bool serialize_state(const system_state *state, char *str)
     raw |= ((state->tank_pressure >> 6) & 0xf);
     str[1] = binary_to_base64(raw);
 
-    //use all the bits of this next one to hold bits 5-0 of tank pressure
+    // Use all the bits of this next one to hold bits 5-0 of tank pressure
     raw = (state->tank_pressure & 0x3f);
     str[2] = binary_to_base64(raw);
 
@@ -66,9 +66,33 @@ bool serialize_state(const system_state *state, char *str)
     // Bit 4 represents whether errors have been detected
     if (state->any_errors_detected)
         raw |= 0b00010000;
+    // Bits 3-0 are the top bits 13-10 of the bus battery voltage
+    raw |= (state->bus_battery_voltage_mv >> 10) & 0xf;
     str[3] = binary_to_base64(raw);
 
-    str[4] = '\0';
+    raw = 0;
+    // Bits 5-0 hold bits 9-4 of the bus battery voltage
+    raw = (state->bus_battery_voltage_mv >> 4) & 0x3f ;
+    str[4] = binary_to_base64(raw);
+
+    raw = 0;
+    // Bits 5-2 hold bits 3-0 of the bus battery voltage
+    raw = (state->bus_battery_voltage_mv & 0xf) << 2;
+    // Bits 1-0 hold bits 13-12 of the vent battery voltage
+    raw |= (state->vent_battery_voltage_mv >> 12) & 0x3;
+    str[5] = binary_to_base64(raw);
+
+    raw = 0;
+    // Bits 5-0 hold bits 11-6 of the vent battery voltage
+    raw = (state->vent_battery_voltage_mv >> 6) & 0x3f;
+    str[6] = binary_to_base64(raw);
+
+    raw = 0;
+    // Bits 5-0 hold bits 5-0 of the vent battery voltage
+    raw = (state->vent_battery_voltage_mv & 0x3f);
+    str[7] = binary_to_base64(raw);
+
+    str[8] = '\0';
 
     return true;
 }
@@ -84,7 +108,7 @@ bool deserialize_state(system_state *state, const char *str)
 
     // Bits 5-2 represent the number of boards connected
     state->num_boards_connected = (raw & 0b00111100) >> 2;
-    // Bits 1-0 respresent injector valve state
+    // Bits 1-0 represent injector valve state
     state->injector_valve_state = raw & 0x3;
 
     raw = base64_to_binary(str[1]);
@@ -102,6 +126,26 @@ bool deserialize_state(system_state *state, const char *str)
     state->bus_is_powered = raw & 0x20;
     // Bit 4 represents whether any errors are active
     state->any_errors_detected = raw & 0x10;
+    // Bits 3-0 represent the top 13-10 bits of the bus battery voltage
+    state->bus_battery_voltage_mv = (uint16_t) (raw & 0xf) << 10;
+
+    raw = base64_to_binary(str[4]);
+    // Bits 5-0 represent bits 9-4 of the bus battery voltage
+    state->bus_battery_voltage_mv |= (raw & 0x3f) << 4;
+
+    raw = base64_to_binary(str[5]);
+    // Bits 5-2 represent bits 3-0 of the bus battery voltage
+    state->bus_battery_voltage_mv |= (raw & 0x3c) >> 2;
+    // Bits 1-0 represent bits 13-12 of the vent battery voltage
+    state->vent_battery_voltage_mv = (uint16_t) (raw & 0x3) << 12;
+
+    raw = base64_to_binary(str[6]);
+    // Bits 5-0 represent bits 11-6 of the vent battery voltage
+    state->vent_battery_voltage_mv |= (raw & 0x3f) << 6;
+
+    raw = base64_to_binary(str[7]);
+    // Bits 5-0 represent bits 5-0 of the vent battery voltage
+    state->vent_battery_voltage_mv |= raw & 0x3f;
 
     return true;
 }

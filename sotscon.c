@@ -9,10 +9,10 @@
 
 /*
  * We key boards by their unique id. In theory there could be up to 32 of
- * these, but at present there are only 12 defined IDs, so we can have just
+ * these, but at present there are only 14 defined IDs, so we can have just
  * those.
  */
-#define MAX_BOARD_UNIQUE_ID 0x0C
+#define MAX_BOARD_UNIQUE_ID 0x0E
 
 /*
  * We keep track of how many consecutive E_NOMINAL general status messages
@@ -66,6 +66,13 @@ static bool errors_active = false;
  * Every time we get a pressure reading from sensor, put it here
  */
 static uint16_t last_tank_pressure = 0;
+
+/*
+ * Keep track of the battery voltage for both the vent and injector valves.
+ * These voltages are in millivolts.
+ */
+static uint16_t vent_battery_voltage_mv = 0;
+static uint16_t inj_battery_voltage_mv = 0;
 
 /* Private function declarations */
 static void update_all_timeouts(void);
@@ -174,6 +181,14 @@ void handle_incoming_can_message(const can_msg_t *msg)
                     // we have a pressure, update the pressure
                     last_tank_pressure = ((uint16_t) msg->data[3] << 8) | msg->data[4];
                 }
+                if (msg->data[2] == SENSOR_VENT_BATT) {
+                    // we have a vent battery voltage, update the battery voltage
+                    vent_battery_voltage_mv = ((uint16_t) msg->data[3] << 8) | msg->data[4];
+                }
+                if (msg->data[2] == SENSOR_INJ_BATT) {
+                    // we have a inj battery voltage, update the battery voltage
+                    inj_battery_voltage_mv = ((uint16_t) msg->data[3] << 8) | msg->data[4];
+                }
                 boards[sender_unique_id].valid = true;
                 boards[sender_unique_id].time_last_message_received_ms = millis();
                 break;
@@ -247,6 +262,16 @@ uint16_t current_tank_pressure(void)
     } else {
         return last_tank_pressure;
     }
+}
+
+uint16_t current_vent_batt_mv(void)
+{
+    return vent_battery_voltage_mv;
+}
+
+uint16_t current_inj_batt_mv(void)
+{
+    return inj_battery_voltage_mv;
 }
 
 /* Private function definitions */

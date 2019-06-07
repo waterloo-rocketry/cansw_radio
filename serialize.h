@@ -12,14 +12,14 @@
  * a serialized system state should have SERIALIZED_OUTPUT_LEN - 1 ascii
  * characters in it
  */
-#define SERIALIZED_OUTPUT_LEN 5
+#define SERIALIZED_OUTPUT_LEN 9
 /*
  * Length of a state command. A state command is a block of characters
  * that can be sent over the radio. It's mostly the serialized state output
  * with a couple of additional bytes for STATE_COMMAND header and for a
  * CRC or hamming code
  */
-#define STATE_COMMAND_LEN 7
+#define STATE_COMMAND_LEN (SERIALIZED_OUTPUT_LEN + 2)
 /*
  * This character indicates the beginning of a state command.
  */
@@ -44,6 +44,8 @@ typedef struct {
     enum VALVE_STATE vent_valve_state;
     bool bus_is_powered;
     bool any_errors_detected;
+    uint16_t bus_battery_voltage_mv;
+    uint16_t vent_battery_voltage_mv;
 } system_state;
 
 /*

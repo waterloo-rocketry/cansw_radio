@@ -84,4 +84,12 @@ bool any_errors_active(void);
  */
 uint16_t current_tank_pressure(void);
 
+/*
+ * These two functions return the last received battery voltages from vent and
+ * injector. These functions do not clamp their return values, so can return
+ * up to 65535.
+ */
+uint16_t current_vent_batt_mv(void);
+uint16_t current_inj_batt_mv(void);
+
 #endif
