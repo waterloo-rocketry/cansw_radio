@@ -74,6 +74,12 @@ static uint16_t last_tank_pressure = 0;
 static uint16_t vent_battery_voltage_mv = 0;
 static uint16_t inj_battery_voltage_mv = 0;
 
+/*
+ * Keep track of the last position that we got from GPS board
+ */
+static uint8_t lat_deg, lat_min, lat_dmin, lat_dir;
+static uint8_t lon_deg, lon_min, lon_dmin, lon_dir;
+
 /* Private function declarations */
 static void update_all_timeouts(void);
 static void update_errors_active(void);
@@ -192,10 +198,32 @@ void handle_incoming_can_message(const can_msg_t *msg)
                 boards[sender_unique_id].valid = true;
                 boards[sender_unique_id].time_last_message_received_ms = millis();
                 break;
+
+            /* When we get an update on GPS position, update our internal
+             * records of position.
+             */
+            case MSG_GPS_LATITUDE:
+                if (!get_gps_lat(msg, &lat_deg, &lat_min, &lat_dmin, &lat_dir)) {
+                    report_error(BOARD_UNIQUE_ID, E_ILLEGAL_CAN_MSG, 0, 0, 0, 0);
+                }
+                boards[sender_unique_id].valid = true;
+                boards[sender_unique_id].time_last_message_received_ms = millis();
+                break;
+            case MSG_GPS_LONGITUDE:
+                if (!get_gps_lon(msg, &lon_deg, &lon_min, &lon_dmin, &lon_dir)) {
+                    report_error(BOARD_UNIQUE_ID, E_ILLEGAL_CAN_MSG, 0, 0, 0, 0);
+                }
+                boards[sender_unique_id].valid = true;
+                boards[sender_unique_id].time_last_message_received_ms = millis();
+                break;
+
             /* Handle these messages by updating the last time since we've
                heard from the sender, but otherwise take no action */
             case MSG_VENT_VALVE_CMD:
             case MSG_INJ_VALVE_CMD:
+            case MSG_GPS_TIMESTAMP:
+            case MSG_GPS_ALTITUDE:
+            case MSG_GPS_INFO:
             case MSG_SENSOR_ACC:
             case MSG_SENSOR_GYRO:
             case MSG_SENSOR_MAG:
@@ -272,6 +300,25 @@ uint16_t current_vent_batt_mv(void)
 uint16_t current_inj_batt_mv(void)
 {
     return inj_battery_voltage_mv;
+}
+
+void current_gps_position(uint8_t *latitude_deg,
+                          uint8_t *latitude_min,
+                          uint8_t *latitude_dmin,
+                          uint8_t *latitude_dir,
+                          uint8_t *longitude_deg,
+                          uint8_t *longitude_min,
+                          uint8_t *longitude_dmin,
+                          uint8_t *longitude_dir)
+{
+    *latitude_deg   = lat_deg;
+    *latitude_min   = lat_min;
+    *latitude_dmin  = lat_dmin;
+    *latitude_dir   = lat_dir;
+    *longitude_deg  = lon_deg;
+    *longitude_min  = lon_min;
+    *longitude_dmin = lon_dmin;
+    *longitude_dir  = lon_dir;
 }
 
 /* Private function definitions */

@@ -92,4 +92,19 @@ uint16_t current_tank_pressure(void);
 uint16_t current_vent_batt_mv(void);
 uint16_t current_inj_batt_mv(void);
 
+/*
+ * Gets the last position that we received from GPS board. It's your
+ * responsibility to decode the degrees, minutes, and decimal minutes
+ * into whatever format you want. *_dir is 'E', 'W', 'N', or 'S'
+ */
+void current_gps_position(uint8_t *latitude_deg,
+                          uint8_t *latitude_min,
+                          uint8_t *latitude_dmin,
+                          uint8_t *latitude_dir,
+                          uint8_t *longitude_deg,
+                          uint8_t *longitude_min,
+                          uint8_t *longitude_dmin,
+                          uint8_t *longitude_dir);
+
+
 #endif
