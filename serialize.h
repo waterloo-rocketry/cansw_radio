@@ -89,6 +89,39 @@ bool serialize_error(const error_t *err, char *str);
  */
 bool deserialize_error(error_t *err, const char *str);
 
+#define GPS_MSG_LEN 5
+#define GPS_MSG_HEADER '$'
+/*
+ * Packs the latitude and longitude into str. str must be a buffer
+ * at least GPS_MSG_LEN bytes long. Returns true on success.
+ *
+ * Example of what it might put in str: "$IBIyah4vgY"
+ * Note that this function does not null terminate str
+ */
+bool create_gps_message(uint8_t latitude_deg,
+                        uint8_t latitude_min,
+                        uint8_t latitude_dmin,
+                        uint8_t latitude_dir,
+                        uint8_t longitude_deg,
+                        uint8_t longitude_min,
+                        uint8_t longitude_dmin,
+                        uint8_t longitude_dir,
+                        char *str);
+
+/*
+ * Unpacks str into latitude and longitude values. str must be a buffer
+ * at least GPS_MSG_LEN bytes long. Returns true on success.
+ */
+bool expand_gps_message(uint8_t *latitude_deg,
+                        uint8_t *latitude_min,
+                        uint8_t *latitude_dmin,
+                        uint8_t *latitude_dir,
+                        uint8_t *longitude_deg,
+                        uint8_t *longitude_min,
+                        uint8_t *longitude_dmin,
+                        uint8_t *longitude_dir,
+                        char *str);
+
 /*
  * Returns true if the two system states passed to it are equal (returns
  * false if either of them are NULL). Note that in C you're not just allowed
