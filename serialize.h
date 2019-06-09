@@ -89,7 +89,7 @@ bool serialize_error(const error_t *err, char *str);
  */
 bool deserialize_error(error_t *err, const char *str);
 
-#define GPS_MSG_LEN 5
+#define GPS_MSG_LEN 11
 #define GPS_MSG_HEADER '$'
 /*
  * Packs the latitude and longitude into str. str must be a buffer
