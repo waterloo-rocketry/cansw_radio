@@ -122,4 +122,18 @@ void radio_heartbeat(void)
             time_last_error_msg_sent = millis();
         }
     }
+
+    //send GPS coordinates over radio every 30 seconds
+    static uint32_t time_last_gps_coords_sent = 0;
+    if (millis() - time_last_gps_coords_sent > 30000) {
+        uint8_t lat_deg, lat_min, lat_dmin, lat_dir;
+        uint8_t lon_deg, lon_min, lon_dmin, lon_dir;
+        uint8_t buffer[GPS_MSG_LEN];
+        if (create_gps_message(lat_deg, lat_min, lat_dmin, lat_dir, lon_deg, lon_min,
+                               lon_dmin, lon_dir, buffer)) {
+            uart_transmit_buffer(buffer, GPS_MSG_LEN);
+        } else {
+            report_error(BOARD_UNIQUE_ID, E_CODING_FUCKUP, 0, 0, 0, 0);
+        }
+    }
 }
