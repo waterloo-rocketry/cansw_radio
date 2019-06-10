@@ -128,6 +128,8 @@ void radio_heartbeat(void)
     if (millis() - time_last_gps_coords_sent > 30000) {
         uint8_t lat_deg, lat_min, lat_dmin, lat_dir;
         uint8_t lon_deg, lon_min, lon_dmin, lon_dir;
+        current_gps_position(&lat_deg, &lat_min, &lat_dmin, &lat_dir,
+                             &lon_deg, &lon_min, &lon_dmin, &lon_dir);
         uint8_t buffer[GPS_MSG_LEN];
         if (create_gps_message(lat_deg, lat_min, lat_dmin, lat_dir, lon_deg, lon_min,
                                lon_dmin, lon_dir, buffer)) {
@@ -135,5 +137,6 @@ void radio_heartbeat(void)
         } else {
             report_error(BOARD_UNIQUE_ID, E_CODING_FUCKUP, 0, 0, 0, 0);
         }
+        time_last_gps_coords_sent = millis();
     }
 }

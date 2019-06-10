@@ -18,24 +18,9 @@ static void check_analog_values(void);
 uint16_t analog_get_vin_mv(void)
 {
     /*
-     * the ADC is reading a signal that's divided through a 75K->10K voltage
-     * divider. It's comparing that value to a 4.096V reference voltage with a
-     * 12bit ADC. Let vpin be the voltage at the pin (post divider) and vbatt be
-     * the voltage before the divider
-     *
-     * vpin = analog_last_batt_voltage * 4.096 / 4096 vbatt = vpin / ( (75k +
-     * 10k) / 75k * 10k) vbatt = vpin / (85/750) vbatt =
-     * analog_last_batt_voltage / (85/750) vbatt = analog_last_batt_voltage *
-     * 8.82352
-     *
-     * that math is probably good, but experimentally we were seeing a value of
-     * 1072 on analog_last_batt value when voltage was 9.15, so we're gonna use
-     * a multiplication factor of 8.54 instead
-     *
-     * TODO, more rigourous measurement of what that multiplication factor
-     * should be
+     * Multiplication factor is empirically determined
      */
-    return analog_last_batt_voltage * 8.54;
+    return analog_last_batt_voltage * 4;
 }
 
 uint16_t analog_get_ibatt_ma(void)
@@ -185,12 +170,12 @@ static void check_analog_values(void)
     uint16_t iin = analog_get_ibatt_ma();
     uint16_t iout = analog_get_ibus_ma();
 
-    uint32_t ms_last_vin_error = 0;
-    uint32_t ms_last_iin_error = 0;
-    uint32_t ms_last_iout_error = 0;
+    static uint32_t ms_last_vin_error = 0;
+    static uint32_t ms_last_iin_error = 0;
+    static uint32_t ms_last_iout_error = 0;
 
     if (vin < 10000) {
-        if (millis() - ms_last_vin_error > 1000) {
+        if (millis() - ms_last_vin_error > 5000) {
             ms_last_vin_error = millis();
             report_error(BOARD_UNIQUE_ID,
                          E_BATT_UNDER_VOLTAGE,
@@ -199,7 +184,7 @@ static void check_analog_values(void)
                          0, 0);
         }
     } else if (vin > 14000) {
-        if (millis() - ms_last_vin_error > 1000) {
+        if (millis() - ms_last_vin_error > 5000) {
             ms_last_vin_error = millis();
             report_error(BOARD_UNIQUE_ID,
                          E_BATT_OVER_VOLTAGE,
@@ -210,7 +195,7 @@ static void check_analog_values(void)
     }
 
     if (iin > 2000) {
-        if (millis() - ms_last_iin_error > 1000) {
+        if (millis() - ms_last_iin_error > 5000) {
             ms_last_iin_error = millis();
             report_error(BOARD_UNIQUE_ID,
                          E_BATT_OVER_CURRENT,
@@ -221,7 +206,7 @@ static void check_analog_values(void)
     }
 
     if (iout > 2000) {
-        if (millis() - ms_last_iout_error > 1000) {
+        if (millis() - ms_last_iout_error > 5000) {
             ms_last_iout_error = millis();
             report_error(BOARD_UNIQUE_ID,
                          E_BUS_OVER_CURRENT,

@@ -319,6 +319,11 @@ void current_gps_position(uint8_t *latitude_deg,
     *longitude_min  = lon_min;
     *longitude_dmin = lon_dmin;
     *longitude_dir  = lon_dir;
+
+    if (*longitude_dir != 'E' && *longitude_dir != 'W')
+        *longitude_dir = 'E';
+    if (*latitude_dir != 'N' && *latitude_dir != 'S')
+        *latitude_dir = 'S';
 }
 
 /* Private function definitions */
