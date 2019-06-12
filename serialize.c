@@ -258,10 +258,10 @@ bool create_gps_message(uint8_t latitude_deg,
     str[4] = binary_to_base64(latitude_dmin & 0x3f);
     str[5] = binary_to_base64((longitude_deg >> 2) & 0x3f);
     str[6] = binary_to_base64(((longitude_deg << 4) & 0x30) |
-                              ((latitude_min >> 4) & 0xf));
+                              ((longitude_min >> 4) & 0xf));
 
     str[7] = binary_to_base64(((longitude_min << 2) & 0x3c) |
-                              ((latitude_dmin >> 6) & 0x3));
+                              ((longitude_dmin >> 6) & 0x3));
 
     str[8] = binary_to_base64(longitude_dmin & 0x3f);
     str[9] = binary_to_base64((latitude_dir == 'N' ? 0x20 : 0) |
@@ -313,7 +313,7 @@ bool expand_gps_message(uint8_t *latitude_deg,
     *longitude_min  |= (base64_to_binary(str[7]) >> 2) & 0xf;
 
     *longitude_dmin  = (base64_to_binary(str[7]) << 6) & 0xc0;
-    *longitude_dmin |= (base64_to_binary(str[8]))      & 0x30;
+    *longitude_dmin |= (base64_to_binary(str[8]))      & 0x3f;
 
     // last char has lat_dir (1=='N', 0=='S') and lon_dir (1=='E', 0==W)
     *latitude_dir  = (base64_to_binary(str[9]) & 0x20) ? 'N' : 'S';
