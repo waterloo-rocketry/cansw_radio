@@ -33,12 +33,8 @@ void led_manager_heartbeat(void)
         time_last_blink_started = millis();
 
         // only decide these once per cycle to save function calls
-        if (radio_get_expected_vent_valve_state() == VALVE_OPEN) {
-            vent_valve_desired_open = true;
-        }
-        if (radio_get_expected_inj_valve_state() == VALVE_OPEN) {
-            inj_valve_desired_open = true;
-        }
+        vent_valve_desired_open = (radio_get_expected_vent_valve_state() == VALVE_OPEN);
+        inj_valve_desired_open = (radio_get_expected_inj_valve_state() == VALVE_OPEN);
         bus_powered = is_bus_powered();
     }
 
