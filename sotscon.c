@@ -37,18 +37,16 @@ static struct {
 } boards[MAX_BOARD_UNIQUE_ID + 1]; //+1 because array indexing starts at 0
 
 /*
- * Keep track of the unique ids of the vent and injector boards. If we haven't
- * heard from one of the two boards yet, it's unique ID will be recorded as 0
+ * Keep track of the unique ids of the injector board. If we haven't
+ * heard from one of it yet, it's unique ID will be recorded as 0
  */
-static uint8_t vent_board_unique_id = 0;
 static uint8_t  inj_board_unique_id = 0;
 
 /*
- * Keep track of the valve state of the vent and inj valves. When we don't know
+ * Keep track of the valve state of the inj valve. When we don't know
  * the valve state, or if we've gone through a timeout, these will be set to
  * VALVE_UNK
  */
-static enum VALVE_STATE vent_valve_state;
 static enum VALVE_STATE  inj_valve_state;
 
 /*
@@ -68,10 +66,9 @@ static bool errors_active = false;
 static uint16_t last_tank_pressure = 0;
 
 /*
- * Keep track of the battery voltage for both the vent and injector valves.
+ * Keep track of the battery voltage for both the injector valve.
  * These voltages are in millivolts.
  */
-static uint16_t vent_battery_voltage_mv = 0;
 static uint16_t inj_battery_voltage_mv = 0;
 
 /*
@@ -95,9 +92,7 @@ void init_sotscon(void)
 
     /* Set connected boards, unique id's, and valve states */
     connected_boards = 0;
-    vent_board_unique_id = 0;
     inj_board_unique_id = 0;
-    vent_valve_state = VALVE_UNK;
     inj_valve_state = VALVE_UNK;
 }
 
@@ -131,29 +126,8 @@ void handle_incoming_can_message(const can_msg_t *msg)
                 }
                 break;
 
-            /* Update our idea of the last vent valve state */
             case MSG_VENT_VALVE_STATUS:
-                //we've now heard from it, so it exists
-                boards[sender_unique_id].valid = true;
-                //update the last time we heard from it
-                boards[sender_unique_id].time_last_message_received_ms = millis();
-
-                //validate byte 3 (valve state), and if it's ok remember it
-                if (sender_unique_id != vent_board_unique_id &&
-                    vent_board_unique_id != 0) {
-                    //this is very very bad. You cannot have 2 vent boards
-                    report_error(BOARD_UNIQUE_ID, E_ILLEGAL_CAN_MSG, 0, 0, 0, 0);
-                } else if (msg->data[3] != VALVE_OPEN &&
-                           msg->data[3] != VALVE_CLOSED &&
-                           msg->data[3] != VALVE_UNK &&
-                           msg->data[3] != VALVE_ILLEGAL) {
-                    //this is also bad, this is not a valid valve_state
-                    report_error(BOARD_UNIQUE_ID, E_ILLEGAL_CAN_MSG, 0, 0, 0, 0);
-                } else {
-                    //yay, we know the state now
-                    vent_valve_state = msg->data[3];
-                    vent_board_unique_id = sender_unique_id;
-                }
+                //vent board is dead, we ignore these messages
                 break;
 
             /* Update our idea of the last inj valve state */
@@ -164,8 +138,8 @@ void handle_incoming_can_message(const can_msg_t *msg)
                 //validate byte 3 (valve state), and if it's ok remember it
                 if (sender_unique_id != inj_board_unique_id &&
                     inj_board_unique_id != 0) {
-                    //this is very very bad. You cannot have 2 vent boards
-                    report_error(BOARD_UNIQUE_ID, E_ILLEGAL_CAN_MSG, 0, 0, 0, 0);
+                    //this is very very bad. You cannot have 2 injector boards
+                    report_error(BOARD_UNIQUE_ID, E_ILLEGAL_CAN_MSG, sender_unique_id, inj_board_unique_id, 0, 0);
                 } else if (msg->data[3] != VALVE_OPEN &&
                            msg->data[3] != VALVE_CLOSED &&
                            msg->data[3] != VALVE_UNK &&
@@ -186,10 +160,6 @@ void handle_incoming_can_message(const can_msg_t *msg)
                 if (msg->data[2] == SENSOR_PRESSURE_OX) {
                     // we have a pressure, update the pressure
                     last_tank_pressure = ((uint16_t) msg->data[3] << 8) | msg->data[4];
-                }
-                if (msg->data[2] == SENSOR_VENT_BATT) {
-                    // we have a vent battery voltage, update the battery voltage
-                    vent_battery_voltage_mv = ((uint16_t) msg->data[3] << 8) | msg->data[4];
                 }
                 if (msg->data[2] == SENSOR_INJ_BATT) {
                     // we have a inj battery voltage, update the battery voltage
@@ -251,20 +221,15 @@ void handle_incoming_can_message(const can_msg_t *msg)
             /* We have provided cases for every message type in the spreadsheet,
                so if we get to the default case, that either means that one of
                the boards is sending a SID that it shouldn't be, or that we added
-               a message type and haven't updated this code. Either way, report
-               it as an error and move on */
+               a message type and haven't updated this code.*/
             default:
-                report_error(BOARD_UNIQUE_ID, E_ILLEGAL_CAN_MSG, 0, 0, 0, 0);
+                // Not throwing an error here because there's a lot of noise
+                // from malformed messages that don't need to be reported to RLCS
                 break;
         }
     }
 }
 
-enum VALVE_STATE current_vent_valve_position(void)
-{
-    update_all_timeouts();
-    return vent_valve_state;
-}
 
 enum VALVE_STATE current_inj_valve_position(void)
 {
@@ -290,11 +255,6 @@ uint16_t current_tank_pressure(void)
     } else {
         return last_tank_pressure;
     }
-}
-
-uint16_t current_vent_batt_mv(void)
-{
-    return vent_battery_voltage_mv;
 }
 
 uint16_t current_inj_batt_mv(void)
@@ -348,16 +308,6 @@ static void update_all_timeouts(void)
                 report_error(BOARD_UNIQUE_ID, E_BOARD_FEARED_DEAD, i, 0, 0, 0);
             }
         }
-    }
-
-    /*
-     * Check if we heard from the injector board recently enough. Set
-     * `inj_valve_state` and `vent_valve_state` based on that.
-     */
-    if (vent_board_unique_id == 0 || (!boards[vent_board_unique_id].valid) ||
-        ((current_time_ms - boards[vent_board_unique_id].time_last_message_received_ms)
-         >= MIN_TIME_BETWEEN_VALVE_UPDATE_MS)) {
-        vent_valve_state = VALVE_UNK;
     }
 
     if (inj_board_unique_id == 0 || (!boards[inj_board_unique_id].valid) ||

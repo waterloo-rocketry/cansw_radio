@@ -41,11 +41,14 @@ void radio_handle_input_character(uint8_t c)
         current_state.tank_pressure = current_tank_pressure();
         current_state.num_boards_connected = current_num_boards_connected();
         current_state.injector_valve_state = current_inj_valve_position();
-        current_state.vent_valve_state = current_vent_valve_position();
+        // Just tell them that vent is whatever they want it to be. This
+        // prevents tower box from flooding us with messages to change our
+        // state, thus saving battery power
+        current_state.vent_valve_state = vent_valve_state;
         current_state.bus_is_powered = is_bus_powered();
         current_state.any_errors_detected = any_errors_active();
         current_state.bus_battery_voltage_mv = current_inj_batt_mv();
-        current_state.vent_battery_voltage_mv = current_vent_batt_mv();
+        current_state.vent_battery_voltage_mv = 0;
 
         // Clamp battery voltages to 14 bits
         if (current_state.bus_battery_voltage_mv > 0x3FFF)
